@@ -1,3 +1,4 @@
+/* asset recovery v4: force original media and delayed JS to load on clone */
 (function(){
   'use strict';
   const ORIGIN='https://adselams.com/';
