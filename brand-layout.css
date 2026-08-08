@@ -1,0 +1,63 @@
+/* ELNASHARGROUP logo geometry: always preserve the complete wordmark and aspect ratio. */
+.header__logo-2,
+.header__logo-2>a,
+.offcanvas__logo,
+.offcanvas__logo>a{overflow:visible!important;min-width:0!important;flex-shrink:0!important}
+
+.header__logo-2 img[src*="elnashargroup-logo"],
+.header__logo-2 img[alt="logo"],
+.header__logo-2 img[alt="ELNASHARGROUP"],
+header img[data-elnashar-brand="logo"]{
+  display:block!important;
+  width:min(230px,52vw)!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  min-width:0!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+  overflow:visible!important;
+  clip-path:none!important;
+  transform:none!important;
+  flex-shrink:0!important;
+}
+
+.offcanvas__logo img[src*="elnashargroup-logo"],
+.offcanvas__logo img[alt="ELNASHARGROUP"]{
+  display:block!important;
+  width:min(240px,72vw)!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+
+footer img[src*="elnashargroup-logo"],
+footer img[data-elnashar-brand="logo"]{
+  display:block!important;
+  width:min(285px,82vw)!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+
+@media(max-width:767px){
+  .header__logo-2 img[src*="elnashargroup-logo"],
+  .header__logo-2 img[alt="logo"],
+  .header__logo-2 img[alt="ELNASHARGROUP"],
+  header img[data-elnashar-brand="logo"]{width:min(190px,55vw)!important;height:auto!important;max-width:none!important}
+}
+
+@media(max-width:380px){
+  .header__logo-2 img[src*="elnashargroup-logo"],
+  .header__logo-2 img[alt="logo"],
+  .header__logo-2 img[alt="ELNASHARGROUP"],
+  header img[data-elnashar-brand="logo"]{width:min(168px,52vw)!important;height:auto!important;max-width:none!important}
+}
