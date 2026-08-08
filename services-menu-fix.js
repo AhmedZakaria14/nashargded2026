@@ -12,13 +12,12 @@
     const chain=[li,li.parentElement,li.closest('.header__nav-2'),li.closest('.header__inner-2'),li.closest('.header__area-2')].filter(Boolean);
     chain.forEach(el=>el.style.setProperty('overflow','visible','important'));
 
-    function place(open){
+    const place=(open)=>{
       if(window.innerWidth<1200) return;
       const r=li.getBoundingClientRect();
       let left=r.left;
       if(left+300>window.innerWidth-8) left=window.innerWidth-308;
       if(left<8) left=8;
-
       menu.style.setProperty('position','fixed','important');
       menu.style.setProperty('left',left+'px','important');
       menu.style.setProperty('right','auto','important');
@@ -29,9 +28,9 @@
       menu.style.setProperty('z-index','100003','important');
       menu.style.setProperty('background','#fff','important');
       menu.style.setProperty('transform','none','important');
-    }
+    };
 
-    function openMenu(){
+    const openMenu=()=>{
       if(window.innerWidth<1200) return;
       li.classList.add('services-dropdown-exact-open');
       trigger.setAttribute('aria-expanded','true');
@@ -43,9 +42,9 @@
         place(true);
         menu.style.setProperty('opacity','1','important');
       });
-    }
+    };
 
-    function closeMenu(){
+    const closeMenu=()=>{
       if(window.innerWidth<1200) return;
       li.classList.remove('services-dropdown-exact-open');
       trigger.setAttribute('aria-expanded','false');
@@ -53,31 +52,33 @@
       menu.style.setProperty('opacity','0','important');
       menu.style.setProperty('visibility','hidden','important');
       menu.style.setProperty('pointer-events','none','important');
+    };
+
+    if(li.dataset.exactServicesDesktop==='1'){
+      if(li.classList.contains('services-dropdown-exact-open')) place(true);
+      return;
     }
 
-    if(!li.dataset.exactServicesDesktop){
-      li.dataset.exactServicesDesktop='1';
-      trigger.setAttribute('aria-haspopup','true');
-      trigger.setAttribute('aria-expanded','false');
-      li.addEventListener('mouseenter',openMenu);
-      li.addEventListener('mouseleave',closeMenu);
-      li.addEventListener('focusin',openMenu);
-      li.addEventListener('focusout',()=>setTimeout(()=>{if(!li.contains(document.activeElement))closeMenu()},0));
-      trigger.addEventListener('click',e=>{
-        if(window.innerWidth<1200) return;
-        if(window.matchMedia('(hover:none),(pointer:coarse)').matches){
-          if(!li.classList.contains('services-dropdown-exact-open')){
-            e.preventDefault();
-            openMenu();
-          }
-        }
-      });
-      document.addEventListener('click',e=>{if(!li.contains(e.target))closeMenu()});
-      document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();trigger.focus()}});
-      window.addEventListener('resize',()=>{if(li.classList.contains('services-dropdown-exact-open'))place(true)});
-      window.addEventListener('scroll',()=>{if(li.classList.contains('services-dropdown-exact-open'))place(true)},{passive:true});
-    }
+    li.dataset.exactServicesDesktop='1';
+    trigger.setAttribute('aria-haspopup','true');
+    trigger.setAttribute('aria-expanded','false');
     closeMenu();
+
+    li.addEventListener('mouseenter',openMenu);
+    li.addEventListener('mouseleave',closeMenu);
+    li.addEventListener('focusin',openMenu);
+    li.addEventListener('focusout',()=>setTimeout(()=>{if(!li.contains(document.activeElement))closeMenu()},0));
+    trigger.addEventListener('click',e=>{
+      if(window.innerWidth<1200) return;
+      if(window.matchMedia('(hover:none),(pointer:coarse)').matches && !li.classList.contains('services-dropdown-exact-open')){
+        e.preventDefault();
+        openMenu();
+      }
+    });
+    document.addEventListener('click',e=>{if(!li.contains(e.target))closeMenu()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();trigger.focus()}});
+    window.addEventListener('resize',()=>{if(li.classList.contains('services-dropdown-exact-open'))place(true)});
+    window.addEventListener('scroll',()=>{if(li.classList.contains('services-dropdown-exact-open'))place(true)},{passive:true});
   }
 
   function exactMobileMenu(){
@@ -87,20 +88,24 @@
     const menu=li.querySelector(':scope>.main-dropdown-menu');
     if(!trigger||!menu) return;
 
-    /* Remove old fallback controls so only one controller exists. */
-    li.querySelectorAll(':scope>.nashar-services-toggle,:scope>.services-mobile-exact-toggle').forEach(b=>b.remove());
-    li.classList.remove('services-mobile-open');
-
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='services-mobile-exact-toggle';
-    btn.setAttribute('aria-label','فتح قائمة خدماتنا');
-    btn.setAttribute('aria-expanded','false');
-    li.appendChild(btn);
-
+    if(li.dataset.exactServicesMobile==='1') return;
+    li.dataset.exactServicesMobile='1';
+    li.classList.remove('services-mobile-open','services-mobile-exact-open');
     trigger.setAttribute('aria-haspopup','true');
     trigger.setAttribute('aria-expanded','false');
-    li.classList.remove('services-mobile-exact-open');
+
+    const old=li.querySelector(':scope>.nashar-services-toggle');
+    if(old) old.setAttribute('hidden','hidden');
+
+    let btn=li.querySelector(':scope>.services-mobile-exact-toggle');
+    if(!btn){
+      btn=document.createElement('button');
+      btn.type='button';
+      btn.className='services-mobile-exact-toggle';
+      btn.setAttribute('aria-label','فتح قائمة خدماتنا');
+      btn.setAttribute('aria-expanded','false');
+      li.appendChild(btn);
+    }
 
     btn.addEventListener('click',e=>{
       e.preventDefault();
@@ -120,6 +125,11 @@
   setTimeout(init,250);
   setTimeout(init,1200);
 
-  const observer=new MutationObserver(()=>init());
+  let queued=false;
+  const observer=new MutationObserver(()=>{
+    if(queued) return;
+    queued=true;
+    requestAnimationFrame(()=>{queued=false;init()});
+  });
   observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
