@@ -1,0 +1,47 @@
+name: Apply homepage asset recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets-fix.js'
+      - 'assets-fix.css'
+      - '.github/workflows/apply-assets-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject recovery CSS and JS without altering layout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          css='<link rel="stylesheet" href="/assets-fix.css?v=3">'
+          js='<script src="/assets-fix.js?v=3" defer></script>'
+          # Remove previous versions if this workflow is re-run.
+          import re
+          s=re.sub(r'<link rel="stylesheet" href="/assets-fix\.css\?v=\d+">','',s)
+          s=re.sub(r'<script src="/assets-fix\.js\?v=\d+" defer></script>','',s)
+          if '</head>' not in s or '</body>' not in s:
+              raise SystemExit('Unexpected index.html structure')
+          s=s.replace('</head>',css+'</head>',1)
+          s=s.replace('</body>',js+'</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Commit homepage patch
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Load original symbols and images reliably'
+          git push
