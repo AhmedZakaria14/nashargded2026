@@ -1,0 +1,93 @@
+name: Restore exact supplied homepage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/restore-exact-home.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore exact supplied homepage
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Preserve the current Nashar SPA for its existing internal routes.
+          cp index.html spa.html
+
+          # Reconstruct the uploaded homepage byte-for-byte.
+          cat .payload/home-index.*.part | base64 -d | gzip -d > /tmp/index.html
+          test "$(git hash-object /tmp/index.html)" = "bed6cda9ff5788822ea794b3932213a12a22ab81"
+          mv /tmp/index.html index.html
+
+          # Fetch the exact LiteSpeed stylesheet referenced by the saved page,
+          # then reject it if it differs from the uploaded archive.
+          mkdir -p wp-content/litespeed/ucss
+          curl -L --fail --retry 3 --connect-timeout 20 \
+            'https://adselams.com/wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c.css?ver=d6958' \
+            -o 'wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver=d6958.css'
+          test "$(git hash-object 'wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver=d6958.css')" = "80b5d95f6d56727574b66ad517ea3fd78933d867"
+
+          # The saved page points at a URL-encoded '=' filename. Keep a matching alias too.
+          cp 'wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver=d6958.css' \
+             'wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver%3Dd6958.css'
+
+          # Preserve the original PingAR font already stored in the repository.
+          test -f 'wp-content/uploads/useanyfont/5319PingAR.woff2'
+
+          cat > vercel.json <<'JSON'
+          {
+            "cleanUrls": true,
+            "trailingSlash": true,
+            "rewrites": [
+              { "source": "/about-us/", "destination": "/spa.html" },
+              { "source": "/services/", "destination": "/spa.html" },
+              { "source": "/seo/", "destination": "/spa.html" },
+              { "source": "/digital-ads-2/", "destination": "/spa.html" },
+              { "source": "/social-media/", "destination": "/spa.html" },
+              { "source": "/website-dev/", "destination": "/spa.html" },
+              { "source": "/e-commerce-solutions/", "destination": "/spa.html" },
+              { "source": "/creatives-designs/", "destination": "/spa.html" },
+              { "source": "/motion-graphic/", "destination": "/spa.html" },
+              { "source": "/mobile-application/", "destination": "/spa.html" },
+              { "source": "/influencers-marketing/", "destination": "/spa.html" },
+              { "source": "/portfolio/", "destination": "/spa.html" },
+              { "source": "/blog/", "destination": "/spa.html" },
+              { "source": "/blog/:path*", "destination": "/spa.html" },
+              { "source": "/contact-us/", "destination": "/spa.html" },
+              { "source": "/faq/", "destination": "/spa.html" },
+              { "source": "/careers/", "destination": "/spa.html" },
+              { "source": "/privacy-policy/", "destination": "/spa.html" },
+              { "source": "/en/", "destination": "/spa.html" },
+
+              { "source": "/wp-content/plugins/:path*", "destination": "https://adselams.com/wp-content/plugins/:path*" },
+              { "source": "/wp-includes/:path*", "destination": "https://adselams.com/wp-includes/:path*" },
+              { "source": "/assets/:path*", "destination": "https://adselams.com/assets/:path*" },
+              { "source": "/wp-content/uploads/elementor/:path*", "destination": "https://adselams.com/wp-content/uploads/elementor/:path*" },
+              { "source": "/wp-content/uploads/2024/:path*", "destination": "https://adselams.com/wp-content/uploads/2024/:path*" }
+            ]
+          }
+          JSON
+
+          # Staging files are no longer needed once the exact source is restored.
+          rm -rf .payload
+          rm -f .github/workflows/restore-exact-home.yml
+
+      - name: Commit restored homepage
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Restore exact homepage from supplied archive'
+          git push
