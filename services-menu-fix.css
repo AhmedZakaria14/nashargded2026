@@ -1,0 +1,134 @@
+/* Dedicated Services-menu repair. Loaded last so LiteSpeed/MeanMenu cannot break it. */
+
+@media (min-width:1200px){
+  .header__area-2,
+  .header__inner-2,
+  .header__nav-2,
+  .header__nav-2 .main-menu{overflow:visible!important}
+
+  .header__nav-2 .main-menu>li.menu-item-40652,
+  .header__nav-2 .main-menu>li#menu-item-40652{
+    position:relative!important;
+    z-index:100002!important;
+  }
+
+  .header__nav-2 .menu-item-40652>.main-dropdown,
+  .header__nav-2 #menu-item-40652>.main-dropdown{
+    display:block!important;
+    width:300px!important;
+    min-width:300px!important;
+    max-width:300px!important;
+    height:auto!important;
+    padding:15px 0!important;
+    margin:0!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    position:absolute!important;
+    z-index:100003!important;
+    left:0!important;
+    right:auto!important;
+    top:85px!important;
+    background:#fff!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    list-style:none!important;
+    text-align:left!important;
+    transform:none!important;
+    transition:top .3s ease,opacity .3s ease,visibility .3s ease!important;
+  }
+
+  .header__nav-2 .menu-item-40652:hover>.main-dropdown,
+  .header__nav-2 .menu-item-40652:focus-within>.main-dropdown,
+  .header__nav-2 .menu-item-40652.services-dropdown-exact-open>.main-dropdown{
+    top:75px!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+
+  .header__nav-2 .menu-item-40652>.main-dropdown>li{
+    display:block!important;
+    float:none!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    list-style:none!important;
+  }
+
+  .header__nav-2 .menu-item-40652>.main-dropdown>li>a{
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    margin:0!important;
+    padding:10px 20px!important;
+    color:#121212!important;
+    background:transparent!important;
+    font:inherit!important;
+    line-height:1.45!important;
+    text-align:left!important;
+    text-decoration:none!important;
+    text-transform:capitalize!important;
+    white-space:normal!important;
+    letter-spacing:0!important;
+    transition:letter-spacing .3s ease!important;
+  }
+
+  .header__nav-2 .menu-item-40652>.main-dropdown>li>a:hover{
+    color:#121212!important;
+    background:transparent!important;
+    letter-spacing:1px!important;
+  }
+}
+
+/* Off-canvas/mobile copy: predictable accordion, independent of MeanMenu. */
+@media (max-width:1199px){
+  .offcanvas__menu .menu-item-40652{position:relative!important}
+  .offcanvas__menu .menu-item-40652>.main-dropdown-menu{
+    display:none!important;
+    position:static!important;
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    opacity:1!important;
+    visibility:visible!important;
+    transform:none!important;
+    list-style:none!important;
+    background:transparent!important;
+  }
+  .offcanvas__menu .menu-item-40652.services-mobile-exact-open>.main-dropdown-menu{display:block!important}
+  .offcanvas__menu .menu-item-40652>.main-dropdown-menu>li{display:block!important;margin:0!important;padding:0!important;width:100%!important}
+  .offcanvas__menu .menu-item-40652>.main-dropdown-menu>li>a{display:block!important;width:100%!important;box-sizing:border-box!important;padding:10px 20px!important;font-size:16px!important;line-height:1.5!important}
+
+  .services-mobile-exact-toggle{
+    position:absolute!important;
+    left:0!important;
+    right:auto!important;
+    top:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:52px!important;
+    height:58px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    color:inherit!important;
+    z-index:20!important;
+    cursor:pointer!important;
+  }
+  .services-mobile-exact-toggle:before,
+  .services-mobile-exact-toggle:after{
+    content:""!important;
+    position:absolute!important;
+    width:12px!important;
+    height:1.5px!important;
+    background:currentColor!important;
+    transition:transform .25s ease!important;
+  }
+  .services-mobile-exact-toggle:after{transform:rotate(90deg)!important}
+  .menu-item-40652.services-mobile-exact-open>.services-mobile-exact-toggle:after{transform:rotate(0deg)!important}
+}
