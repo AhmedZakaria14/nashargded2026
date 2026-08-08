@@ -20,6 +20,17 @@
     { "source": "/faq/", "destination": "/spa.html" },
     { "source": "/careers/", "destination": "/spa.html" },
     { "source": "/privacy-policy/", "destination": "/spa.html" },
-    { "source": "/en/", "destination": "/spa.html" }
+    { "source": "/en/", "destination": "/spa.html" },
+
+    { "source": "/wp-content/plugins/:path*", "destination": "https://adselams.com/wp-content/plugins/:path*" },
+    { "source": "/wp-content/themes/:path*", "destination": "https://adselams.com/wp-content/themes/:path*" },
+    { "source": "/wp-includes/:path*", "destination": "https://adselams.com/wp-includes/:path*" },
+    { "source": "/wp-content/litespeed/js/:path*", "destination": "https://adselams.com/wp-content/litespeed/js/:path*" },
+    { "source": "/wp-content/uploads/2023/:path*", "destination": "https://adselams.com/wp-content/uploads/2023/:path*" },
+    { "source": "/wp-content/uploads/2024/:path*", "destination": "https://adselams.com/wp-content/uploads/2024/:path*" },
+    { "source": "/wp-content/uploads/2025/:path*", "destination": "https://adselams.com/wp-content/uploads/2025/:path*" },
+    { "source": "/wp-content/uploads/2026/:path*", "destination": "https://adselams.com/wp-content/uploads/2026/:path*" },
+    { "source": "/wp-content/uploads/ac_assets/:path*", "destination": "https://adselams.com/wp-content/uploads/ac_assets/:path*" },
+    { "source": "/fonts.gstatic.com/:path*", "destination": "https://fonts.gstatic.com/:path*" }
   ]
 }
