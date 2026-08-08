@@ -1,15 +1,45 @@
-/* asset recovery v7: force original media and delayed JS to load on clone */
+/* asset recovery v10: restore original media/scripts without fighting branding or menu controllers */
 (function(){
   'use strict';
   const ORIGIN='https://adselams.com/';
+  const BRAND_LOGO='/assets/elnashargroup-logo.svg';
+  const OLD_BRAND_RE=/(adsela-new-logo2|adsela[-_ ]?logo|logo-adsela|adsela-icon-footer|cropped-fav-icon|logo-png-white-01)/i;
+
   const proxy=(url)=>{
     if(!url||typeof url!=='string') return url;
     if(url.startsWith(ORIGIN)) return '/origin/'+url.slice(ORIGIN.length);
     return url;
   };
 
+  function isBrandImage(el){
+    if(!el||el.tagName!=='IMG') return false;
+    const hay=[el.getAttribute('src'),el.getAttribute('data-src'),el.getAttribute('srcset'),el.getAttribute('data-srcset'),el.getAttribute('alt')].filter(Boolean).join(' ');
+    return OLD_BRAND_RE.test(hay) || /^logo$/i.test((el.getAttribute('alt')||'').trim()) || /^ELNASHARGROUP$/i.test((el.getAttribute('alt')||'').trim());
+  }
+
+  function lockHeaderBrand(el){
+    if(!el||el.tagName!=='IMG') return;
+    el.setAttribute('src',BRAND_LOGO);
+    el.setAttribute('alt','ELNASHARGROUP');
+    el.removeAttribute('srcset');
+    el.removeAttribute('data-src');
+    el.removeAttribute('data-srcset');
+    el.removeAttribute('data-sizes');
+    el.style.setProperty('height','55px','important');
+    el.style.setProperty('width','auto','important');
+    el.style.setProperty('max-width','240px','important');
+    el.style.setProperty('object-fit','contain','important');
+    el.style.setProperty('object-position','center','important');
+    el.style.setProperty('visibility','visible','important');
+    el.style.setProperty('opacity','1','important');
+  }
+
   function restoreElement(el){
     if(!el||!el.getAttribute) return;
+    if(isBrandImage(el)){
+      lockHeaderBrand(el);
+      return;
+    }
     const ds=el.getAttribute('data-src');
     const dss=el.getAttribute('data-srcset');
     const dsz=el.getAttribute('data-sizes');
@@ -37,75 +67,8 @@
     (root||document).querySelectorAll('img[data-src],img[data-srcset],source[data-src],source[data-srcset],iframe[data-src],video[data-src],video[data-poster],[data-bg],[data-bg-hidpi]').forEach(restoreElement);
   }
 
-  function initServiceMenus(){
-    const desktop=document.querySelector('.header__nav-2 #menu-item-40652, .header__nav-2 .menu-item-40652');
-    if(desktop && !desktop.dataset.servicesFix){
-      desktop.dataset.servicesFix='1';
-      const trigger=desktop.querySelector(':scope>a');
-      if(trigger){
-        trigger.setAttribute('aria-haspopup','true');
-        desktop.addEventListener('keydown',e=>{
-          if(e.key==='Escape'){
-            desktop.classList.remove('services-dropdown-open');
-            trigger.setAttribute('aria-expanded','false');
-            trigger.focus();
-          }
-        });
-        if(window.matchMedia('(hover:none) and (pointer:coarse)').matches){
-          trigger.addEventListener('click',e=>{
-            if(window.innerWidth>=1200 && !desktop.classList.contains('services-dropdown-open')){
-              e.preventDefault();
-              desktop.classList.add('services-dropdown-open');
-              trigger.setAttribute('aria-expanded','true');
-            }
-          });
-          document.addEventListener('click',e=>{
-            if(!desktop.contains(e.target)){
-              desktop.classList.remove('services-dropdown-open');
-              trigger.setAttribute('aria-expanded','false');
-            }
-          });
-        }
-      }
-    }
-
-    const mobile=document.querySelector('.offcanvas__menu .menu-item-40652');
-    if(mobile && !mobile.dataset.servicesFix){
-      mobile.dataset.servicesFix='1';
-      const wrapper=mobile.closest('.offcanvas__menu-wrapper');
-      const trigger=mobile.querySelector(':scope>a');
-      const submenu=mobile.querySelector(':scope>.main-dropdown-menu');
-      if(wrapper && trigger && submenu){
-        trigger.setAttribute('aria-haspopup','true');
-        if(!wrapper.classList.contains('mean-container')){
-          let toggle=mobile.querySelector(':scope>.nashar-services-toggle');
-          if(!toggle){
-            toggle=document.createElement('button');
-            toggle.type='button';
-            toggle.className='nashar-services-toggle';
-            toggle.setAttribute('aria-label','فتح قائمة خدماتنا');
-            toggle.setAttribute('aria-expanded','false');
-            mobile.appendChild(toggle);
-          }
-          toggle.addEventListener('click',e=>{
-            e.preventDefault();e.stopPropagation();
-            const open=mobile.classList.toggle('services-mobile-open');
-            toggle.setAttribute('aria-expanded',open?'true':'false');
-            trigger.setAttribute('aria-expanded',open?'true':'false');
-          });
-        }
-      }
-    }
-  }
-
   function stabilizeReferenceAreas(){
-    const logo=document.querySelector('.header__logo-2 img[alt="logo"]');
-    if(logo){
-      if(!logo.src || logo.src.startsWith('data:')) logo.src='/origin/wp-content/uploads/2024/09/Adsela-new-logo2.png.webp';
-      logo.style.setProperty('height','55px','important');
-      logo.style.setProperty('width','auto','important');
-      logo.style.setProperty('object-fit','contain','important');
-    }
+    document.querySelectorAll('.header__logo-2 img[alt="logo"],.header__logo-2 img[alt="ELNASHARGROUP"],header img[data-src*="Adsela-new-logo2"],header img[src*="Adsela-new-logo2"]').forEach(lockHeaderBrand);
     const partner=document.getElementById('uc_logo_carousel_elementor_c98c777');
     if(partner){
       partner.querySelectorAll('img').forEach(img=>{
@@ -117,7 +80,6 @@
         img.style.setProperty('opacity','1','important');
       });
     }
-    initServiceMenus();
   }
 
   function rewriteDelayedScriptSources(){
@@ -153,14 +115,20 @@
 
   function fixBrokenImages(){
     document.querySelectorAll('img').forEach(img=>{
+      if(img.dataset.assetErrorFix) return;
+      img.dataset.assetErrorFix='1';
       img.addEventListener('error',function(){
+        if(isBrandImage(this)){
+          lockHeaderBrand(this);
+          return;
+        }
         const current=this.currentSrc||this.src;
         if(current&&current.includes('/origin/')){
           const direct=ORIGIN+current.split('/origin/')[1];
           if(this.src!==direct){this.src=direct;return;}
         }
         this.style.visibility='hidden';
-      },{once:false});
+      });
     });
   }
 
@@ -172,7 +140,12 @@
     setTimeout(forceDelayedScripts,30);
     setTimeout(stabilizeReferenceAreas,250);
     setTimeout(stabilizeReferenceAreas,1200);
-    const mo=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){restoreElement(n);restoreMedia(n);stabilizeReferenceAreas()}})));
+    const mo=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{
+      if(n.nodeType!==1) return;
+      restoreElement(n);
+      if(n.querySelectorAll){restoreMedia(n);fixBrokenImages();}
+      stabilizeReferenceAreas();
+    })));
     mo.observe(document.documentElement,{childList:true,subtree:true});
   };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
