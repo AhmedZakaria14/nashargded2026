@@ -2,6 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": true,
   "rewrites": [
+    { "source": "/origin/:path*", "destination": "https://adselams.com/:path*" },
+
     { "source": "/about-us/", "destination": "/spa.html" },
     { "source": "/services/", "destination": "/spa.html" },
     { "source": "/seo/", "destination": "/spa.html" },
