@@ -1,0 +1,35 @@
+/* Compatibility layer for the saved Adsela homepage.
+   Keeps the original typography/layout and restores icon glyph fonts that were
+   previously supplied by LiteSpeed's generated UCSS file. */
+
+@font-face{font-family:"Font Awesome 5 Free";font-style:normal;font-weight:900;font-display:swap;src:url("/wp-content/plugins/elementor/assets/lib/font-awesome/webfonts/fa-solid-900.woff2") format("woff2")}
+@font-face{font-family:"Font Awesome 5 Brands";font-style:normal;font-weight:400;font-display:swap;src:url("/wp-content/plugins/elementor/assets/lib/font-awesome/webfonts/fa-brands-400.woff2") format("woff2")}
+@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:swap;src:url("/wp-content/themes/axtra/assets/webfonts/fa-solid-900.woff2") format("woff2")}
+@font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:swap;src:url("/wp-content/themes/axtra/assets/webfonts/fa-brands-400.woff2") format("woff2")}
+@font-face{font-family:eicons;font-style:normal;font-weight:400;font-display:swap;src:url("/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons_5.43.0.woff2") format("woff2")}
+
+.fa,.fas,.fa-solid{font-family:"Font Awesome 5 Free"!important;font-style:normal;font-weight:900!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.fab,.fa-brands{font-family:"Font Awesome 5 Brands"!important;font-style:normal;font-weight:400!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+[class^="eicon"],[class*=" eicon"]{font-family:eicons!important;font-style:normal;font-weight:400}
+
+.fa-arrow-left:before{content:"\f060"}
+.fa-arrow-right:before{content:"\f061"}
+.fa-arrow-up:before{content:"\f062"}
+.fa-magnifying-glass:before,.fa-search:before{content:"\f002"}
+.fa-check:before{content:"\f00c"}
+.fa-xmark:before,.fa-times:before{content:"\f00d"}
+.fa-star:before{content:"\f005"}
+.fa-facebook:before{content:"\f09a"}
+.fa-instagram:before{content:"\f16d"}
+.fa-linkedin:before{content:"\f08c"}
+.fa-snapchat:before{content:"\f2ab"}
+.fa-youtube:before{content:"\f167"}
+/* The bundled Elementor brand font used by the reference page maps X/Twitter here. */
+.fa-x-twitter:before{content:"\e9ca"}
+
+/* Preserve the original circular social-button geometry and avoid tofu boxes. */
+.elementor-social-icon i,.elementor-social-icon svg{position:relative;z-index:2}
+.elementor-social-icon{overflow:hidden;text-decoration:none!important}
+
+/* Avoid broken-image glyphs while LiteSpeed lazy loading swaps placeholders. */
+img[data-src]{font-size:0;color:transparent}
