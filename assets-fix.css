@@ -32,6 +32,15 @@ img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded){display:flex!important;align-items:center!important;overflow:hidden!important;gap:10px!important;direction:ltr!important;width:100%!important}
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex:0 0 calc((100% - 30px)/4)!important;min-width:0!important;max-width:calc((100% - 30px)/4)!important}
 
+/* Form select caret: draw it with CSS instead of an icon-font glyph.
+   This preserves the exact Elementor placement while preventing tofu squares. */
+.elementor-select-wrapper .select-caret-down-wrapper{inset-inline-end:10px!important;top:50%!important;transform:translateY(-50%)!important;pointer-events:none!important;display:flex!important;align-items:center!important;justify-content:center!important;width:20px!important;height:28px!important;color:inherit!important}
+.elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down{font-family:inherit!important;font-size:0!important;line-height:1!important;width:12px!important;height:12px!important;display:block!important;position:relative!important}
+.elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down:before{content:""!important;display:block!important;width:8px!important;height:8px!important;border-right:1.6px solid currentColor!important;border-bottom:1.6px solid currentColor!important;transform:rotate(45deg)!important;transform-origin:center!important;margin:0 auto 4px!important;box-sizing:border-box!important}
+
+/* Generic chevrons/arrows used in navigation: never show a missing-font square. */
+.fa-chevron-down:before{content:""!important;display:inline-block!important;width:.48em!important;height:.48em!important;border-right:.12em solid currentColor!important;border-bottom:.12em solid currentColor!important;transform:rotate(45deg)!important;vertical-align:.18em!important}
+
 @media (min-width:768px){
   .elementor-37155 .elementor-element.elementor-element-dde27c0{width:30%!important}
   .elementor-37155 .elementor-element.elementor-element-8e5afd7{width:70%!important}
