@@ -1,8 +1,8 @@
 /* ELNASHARGROUP identity controller: old Adsela marks can never win in visible brand slots. */
 (function(){
   'use strict';
-  const BRAND_LOGO='/assets/elnashargroup-logo.svg';
-  const BRAND_ICON='/assets/elnashargroup-icon.svg';
+  const BRAND_LOGO='/assets/elnashargroup-logo-v3.svg';
+  const BRAND_ICON='/assets/elnashargroup-icon-v3.svg';
   const OLD_LOGO_RE=/(adsela(?:[-_ ]?new)?[-_ ]?logo\d*|adsela[-_ ]?logo|logo[-_ ]?adsela|adsela-icon-footer|cropped-fav-icon|logo-png-white-01)/i;
   const FULL_SLOT='.header__logo-2,.offcanvas__logo,.footer__logo,.footer__logo-2,.elnashar-brand,header,.site-header';
 
@@ -10,7 +10,7 @@
   function isBrand(img){
     if(!img||img.tagName!=='IMG') return false;
     const s=text(img),alt=(img.getAttribute('alt')||'').trim();
-    return OLD_LOGO_RE.test(s)||/elnashargroup-(?:logo|icon)\.svg/i.test(s)||/^logo$/i.test(alt)||/^ELNASHARGROUP$/i.test(alt);
+    return OLD_LOGO_RE.test(s)||/elnashargroup-(?:logo|icon)(?:-v3)?\.svg/i.test(s)||/^logo$/i.test(alt)||/^ELNASHARGROUP$/i.test(alt);
   }
   function fullSlot(img){return !!img.closest(FULL_SLOT)}
   function iconOnly(img){
