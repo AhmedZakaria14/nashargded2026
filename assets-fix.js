@@ -1,4 +1,4 @@
-/* asset recovery v6: force original media and delayed JS to load on clone */
+/* asset recovery v7: force original media and delayed JS to load on clone */
 (function(){
   'use strict';
   const ORIGIN='https://adselams.com/';
@@ -37,6 +37,67 @@
     (root||document).querySelectorAll('img[data-src],img[data-srcset],source[data-src],source[data-srcset],iframe[data-src],video[data-src],video[data-poster],[data-bg],[data-bg-hidpi]').forEach(restoreElement);
   }
 
+  function initServiceMenus(){
+    const desktop=document.querySelector('.header__nav-2 #menu-item-40652, .header__nav-2 .menu-item-40652');
+    if(desktop && !desktop.dataset.servicesFix){
+      desktop.dataset.servicesFix='1';
+      const trigger=desktop.querySelector(':scope>a');
+      if(trigger){
+        trigger.setAttribute('aria-haspopup','true');
+        desktop.addEventListener('keydown',e=>{
+          if(e.key==='Escape'){
+            desktop.classList.remove('services-dropdown-open');
+            trigger.setAttribute('aria-expanded','false');
+            trigger.focus();
+          }
+        });
+        if(window.matchMedia('(hover:none) and (pointer:coarse)').matches){
+          trigger.addEventListener('click',e=>{
+            if(window.innerWidth>=1200 && !desktop.classList.contains('services-dropdown-open')){
+              e.preventDefault();
+              desktop.classList.add('services-dropdown-open');
+              trigger.setAttribute('aria-expanded','true');
+            }
+          });
+          document.addEventListener('click',e=>{
+            if(!desktop.contains(e.target)){
+              desktop.classList.remove('services-dropdown-open');
+              trigger.setAttribute('aria-expanded','false');
+            }
+          });
+        }
+      }
+    }
+
+    const mobile=document.querySelector('.offcanvas__menu .menu-item-40652');
+    if(mobile && !mobile.dataset.servicesFix){
+      mobile.dataset.servicesFix='1';
+      const wrapper=mobile.closest('.offcanvas__menu-wrapper');
+      const trigger=mobile.querySelector(':scope>a');
+      const submenu=mobile.querySelector(':scope>.main-dropdown-menu');
+      if(wrapper && trigger && submenu){
+        trigger.setAttribute('aria-haspopup','true');
+        if(!wrapper.classList.contains('mean-container')){
+          let toggle=mobile.querySelector(':scope>.nashar-services-toggle');
+          if(!toggle){
+            toggle=document.createElement('button');
+            toggle.type='button';
+            toggle.className='nashar-services-toggle';
+            toggle.setAttribute('aria-label','فتح قائمة خدماتنا');
+            toggle.setAttribute('aria-expanded','false');
+            mobile.appendChild(toggle);
+          }
+          toggle.addEventListener('click',e=>{
+            e.preventDefault();e.stopPropagation();
+            const open=mobile.classList.toggle('services-mobile-open');
+            toggle.setAttribute('aria-expanded',open?'true':'false');
+            trigger.setAttribute('aria-expanded',open?'true':'false');
+          });
+        }
+      }
+    }
+  }
+
   function stabilizeReferenceAreas(){
     const logo=document.querySelector('.header__logo-2 img[alt="logo"]');
     if(logo){
@@ -56,6 +117,7 @@
         img.style.setProperty('opacity','1','important');
       });
     }
+    initServiceMenus();
   }
 
   function rewriteDelayedScriptSources(){
