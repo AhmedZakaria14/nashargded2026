@@ -1,48 +1,36 @@
-/* ELNASHARGROUP identity layer: one stable source and responsive, non-clipping sizing for every brand mark. */
+/* ELNASHARGROUP identity controller: old Adsela marks can never win in visible brand slots. */
 (function(){
   'use strict';
   const BRAND_LOGO='/assets/elnashargroup-logo.svg';
   const BRAND_ICON='/assets/elnashargroup-icon.svg';
-  const OLD_LOGO_RE=/(adsela-new-logo2|adsela[-_ ]?logo|logo-adsela|adsela-icon-footer|cropped-fav-icon|logo-png-white-01)/i;
+  const OLD_LOGO_RE=/(adsela(?:[-_ ]?new)?[-_ ]?logo\d*|adsela[-_ ]?logo|logo[-_ ]?adsela|adsela-icon-footer|cropped-fav-icon|logo-png-white-01)/i;
+  const FULL_SLOT='.header__logo-2,.offcanvas__logo,.footer__logo,.footer__logo-2,.elnashar-brand,header,.site-header';
 
-  function sourceText(img){
-    return [img.getAttribute('src'),img.getAttribute('data-src'),img.getAttribute('srcset'),img.getAttribute('data-srcset'),img.getAttribute('alt')].filter(Boolean).join(' ');
-  }
-  function isOldBrandImage(img){
+  function text(img){return [img.getAttribute('src'),img.getAttribute('data-src'),img.getAttribute('srcset'),img.getAttribute('data-srcset'),img.getAttribute('alt')].filter(Boolean).join(' ')}
+  function isBrand(img){
     if(!img||img.tagName!=='IMG') return false;
-    return OLD_LOGO_RE.test(sourceText(img)) || /^logo$/i.test((img.getAttribute('alt')||'').trim()) || /^ELNASHARGROUP$/i.test((img.getAttribute('alt')||'').trim());
+    const s=text(img),alt=(img.getAttribute('alt')||'').trim();
+    return OLD_LOGO_RE.test(s)||/elnashargroup-(?:logo|icon)\.svg/i.test(s)||/^logo$/i.test(alt)||/^ELNASHARGROUP$/i.test(alt);
   }
-  function useIconFor(img){
-    return /(icon-footer|cropped-fav|logo-adsela-half|logo-png-white-01)/i.test(sourceText(img));
+  function fullSlot(img){return !!img.closest(FULL_SLOT)}
+  function iconOnly(img){
+    if(fullSlot(img)) return false;
+    return /(icon-footer|cropped-fav|logo-adsela-half|elnashargroup-icon)/i.test(text(img));
   }
 
-  function openBrandContainers(img){
-    const containers=[
-      img.parentElement,
-      img.closest('.header__logo-2'),
-      img.closest('.offcanvas__logo'),
-      img.closest('.footer__logo'),
-      img.closest('.footer__logo-2'),
-      img.closest('.elnashar-brand')
-    ].filter(Boolean);
-    containers.forEach(el=>{
+  function openContainers(img){
+    [img.parentElement,img.closest('.header__logo-2'),img.closest('.offcanvas__logo'),img.closest('.footer__logo'),img.closest('.footer__logo-2'),img.closest('.elnashar-brand')].filter(Boolean).forEach(el=>{
       el.style.setProperty('overflow','visible','important');
       el.style.setProperty('min-width','0','important');
       el.style.setProperty('flex-shrink','0','important');
     });
-    const anchor=img.closest('a');
-    if(anchor){
-      anchor.style.setProperty('display','flex','important');
-      anchor.style.setProperty('align-items','center','important');
-      anchor.style.setProperty('overflow','visible','important');
-      anchor.style.setProperty('flex-shrink','0','important');
-    }
+    const a=img.closest('a');
+    if(a){a.style.setProperty('display','flex','important');a.style.setProperty('align-items','center','important');a.style.setProperty('overflow','visible','important');a.style.setProperty('flex-shrink','0','important')}
   }
 
-  function sizeBrand(img,isIcon){
+  function size(img,isIcon){
     img.classList.add('elnashar-brand-image');
-    img.removeAttribute('width');
-    img.removeAttribute('height');
+    ['width','height'].forEach(a=>img.removeAttribute(a));
     img.style.setProperty('display','block','important');
     img.style.setProperty('height','auto','important');
     img.style.setProperty('max-height','none','important');
@@ -53,95 +41,47 @@
     img.style.setProperty('opacity','1','important');
     img.style.setProperty('clip-path','none','important');
     img.style.setProperty('transform','none','important');
-
-    const inHeader=!!img.closest('.header__logo-2,.header__area-2,header');
-    const inOffcanvas=!!img.closest('.offcanvas__area,.offcanvas__menu,.offcanvas__logo');
-    const inFooter=!!img.closest('footer,.footer__area,.footer__area-2,.footer__logo,.footer__logo-2');
-
-    if(isIcon){
-      if(inHeader) img.style.setProperty('width','48px','important');
-      else if(inOffcanvas) img.style.setProperty('width','56px','important');
-      else img.style.setProperty('width','64px','important');
-    }else if(inHeader){
-      /* 230px desktop; automatically shrinks on narrow phones while preserving the full aspect ratio. */
-      img.style.setProperty('width','min(230px,52vw)','important');
-    }else if(inOffcanvas){
-      img.style.setProperty('width','min(240px,72vw)','important');
-    }else if(inFooter){
-      img.style.setProperty('width','min(285px,82vw)','important');
-    }else{
-      img.style.setProperty('width','min(245px,75vw)','important');
-    }
-    openBrandContainers(img);
+    const header=!!img.closest('.header__logo-2,.header__area-2,header,.site-header');
+    const off=!!img.closest('.offcanvas__area,.offcanvas__menu,.offcanvas__logo');
+    const foot=!!img.closest('footer,.footer__area,.footer__area-2,.footer__logo,.footer__logo-2');
+    if(isIcon) img.style.setProperty('width',header?'48px':off?'56px':'64px','important');
+    else if(header) img.style.setProperty('width','min(230px,52vw)','important');
+    else if(off) img.style.setProperty('width','min(240px,72vw)','important');
+    else if(foot) img.style.setProperty('width','min(285px,82vw)','important');
+    else img.style.setProperty('width','min(245px,75vw)','important');
+    openContainers(img);
   }
 
-  function replaceBrandImage(img){
-    if(!isOldBrandImage(img)) return;
-    const isIcon=useIconFor(img);
-    const target=isIcon?BRAND_ICON:BRAND_LOGO;
+  function replace(img){
+    if(!isBrand(img)) return;
+    const icon=iconOnly(img),target=icon?BRAND_ICON:BRAND_LOGO;
     if(img.getAttribute('src')!==target) img.setAttribute('src',target);
-    img.removeAttribute('srcset');
-    img.removeAttribute('data-src');
-    img.removeAttribute('data-srcset');
-    img.removeAttribute('data-sizes');
-    img.removeAttribute('loading');
+    ['srcset','data-src','data-srcset','data-sizes','loading'].forEach(a=>img.removeAttribute(a));
     img.setAttribute('alt','ELNASHARGROUP');
-    img.dataset.elnasharBrand=isIcon?'icon':'logo';
-    sizeBrand(img,isIcon);
+    img.dataset.elnasharBrand=icon?'icon':'logo';
+    size(img,icon);
   }
 
-  function replaceFavicons(){
-    document.querySelectorAll('link[rel~="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"],link[rel="apple-touch-icon-precomposed"]').forEach(l=>{
-      l.setAttribute('href',BRAND_ICON);
-      if(l.hasAttribute('type')) l.setAttribute('type','image/svg+xml');
-    });
-    if(!document.querySelector('link[data-elnashar-favicon]')){
-      const l=document.createElement('link');
-      l.rel='icon';l.type='image/svg+xml';l.href=BRAND_ICON;l.dataset.elnasharFavicon='1';
-      document.head.appendChild(l);
-    }
+  function favicons(){
+    document.querySelectorAll('link[rel~="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"],link[rel="apple-touch-icon-precomposed"]').forEach(l=>{l.href=BRAND_ICON;l.type='image/svg+xml'});
+    if(!document.querySelector('link[data-elnashar-favicon]')){const l=document.createElement('link');l.rel='icon';l.type='image/svg+xml';l.href=BRAND_ICON;l.dataset.elnasharFavicon='1';document.head.appendChild(l)}
   }
 
-  function replaceInlineBackgrounds(root){
-    (root||document).querySelectorAll('[style]').forEach(el=>{
-      const s=el.getAttribute('style')||'';
-      if(OLD_LOGO_RE.test(s)){
-        el.style.setProperty('background-image','url("'+BRAND_ICON+'")','important');
-        el.style.setProperty('background-size','contain','important');
-        el.style.setProperty('background-repeat','no-repeat','important');
-        el.style.setProperty('background-position','center','important');
-      }
-    });
+  function backgrounds(root){
+    (root||document).querySelectorAll('[style]').forEach(el=>{if(OLD_LOGO_RE.test(el.getAttribute('style')||'')){el.style.setProperty('background-image','url("'+BRAND_ICON+'")','important');el.style.setProperty('background-size','contain','important');el.style.setProperty('background-repeat','no-repeat','important');el.style.setProperty('background-position','center','important')}})
   }
 
-  function updateMetaBranding(){
-    document.querySelectorAll('meta[property="og:image"],meta[name="twitter:image"]').forEach(m=>{
-      if(OLD_LOGO_RE.test(m.content||'')) m.content=location.origin+BRAND_LOGO;
-    });
-  }
-
-  function applyBranding(root){
-    const scope=root||document;
-    if(scope.matches&&scope.matches('img')) replaceBrandImage(scope);
-    if(scope.querySelectorAll) scope.querySelectorAll('img').forEach(replaceBrandImage);
-    replaceInlineBackgrounds(scope);
-    replaceFavicons();
-    updateMetaBranding();
+  function apply(root){
+    const s=root||document;
+    if(s.matches&&s.matches('img')) replace(s);
+    if(s.querySelectorAll) s.querySelectorAll('img').forEach(replace);
+    backgrounds(s);favicons();
   }
 
   function start(){
-    applyBranding(document);
-    const mo=new MutationObserver(ms=>{
-      for(const m of ms){
-        if(m.type==='attributes' && m.target.tagName==='IMG'){
-          replaceBrandImage(m.target);
-          continue;
-        }
-        m.addedNodes.forEach(n=>{if(n.nodeType===1) applyBranding(n)});
-      }
-    });
+    apply(document);
+    const mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='attributes'&&m.target.tagName==='IMG'){replace(m.target);continue}m.addedNodes.forEach(n=>{if(n.nodeType===1)apply(n)})}});
     mo.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src','data-src','srcset','data-srcset','style']});
   }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
