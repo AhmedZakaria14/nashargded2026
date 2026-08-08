@@ -19,6 +19,35 @@ img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15
 .header__logo-2>a{display:flex!important;align-items:center!important;width:auto!important;max-width:100%!important}
 .header__logo-2 img[alt="logo"]{display:block!important;height:55px!important;width:auto!important;max-width:none!important;min-width:0!important;object-fit:contain!important;object-position:center!important;margin:0!important}
 
+/* Exact desktop Services dropdown from the reference site. */
+@media (min-width:1200px){
+  .header__nav-2 .main-menu>li.dropdown{position:relative!important}
+  .header__nav-2 .main-menu>li.dropdown>.main-dropdown{
+    display:block!important;width:300px!important;min-width:300px!important;max-width:300px!important;
+    padding:15px 0!important;margin:0!important;list-style:none!important;
+    visibility:hidden!important;opacity:0!important;pointer-events:none!important;
+    position:absolute!important;z-index:99999!important;background-color:var(--white,#fff)!important;
+    left:0!important;right:auto!important;top:85px!important;text-align:left!important;
+    transform:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+    transition:top .3s ease,opacity .3s ease,visibility .3s ease!important;
+  }
+  .header__nav-2 .main-menu>li.dropdown:hover>.main-dropdown,
+  .header__nav-2 .main-menu>li.dropdown:focus-within>.main-dropdown,
+  .header__nav-2 .main-menu>li.dropdown.services-dropdown-open>.main-dropdown{
+    top:75px!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+  }
+  .header__nav-2 .main-menu>li.dropdown>.main-dropdown>li{display:block!important;width:100%!important;margin:0!important;padding:0!important;float:none!important;list-style:none!important}
+  .header__area-2 .header__nav-2 .main-dropdown li a,
+  .header__nav-2 .main-dropdown li a{
+    display:block!important;width:100%!important;box-sizing:border-box!important;padding:10px 20px!important;margin:0!important;
+    color:var(--black-2,#1d1d1d)!important;background:transparent!important;text-align:right!important;
+    text-decoration:none!important;white-space:normal!important;line-height:1.45!important;letter-spacing:0!important;
+    transition:letter-spacing .3s ease!important;
+  }
+  .header__area-2 .header__nav-2 .main-dropdown li a:hover,
+  .header__nav-2 .main-dropdown li a:hover{letter-spacing:1px!important;background:transparent!important;color:var(--black-2,#1d1d1d)!important}
+}
+
 /* Exact reference proportions for “نفتخر أيضا بشراكاتنا مع”. */
 .elementor-37155 .elementor-element.elementor-element-c9303f0{margin-top:0!important;margin-bottom:0!important;padding:0!important;border-style:none!important;background:#000!important}
 .elementor-37155 .elementor-element.elementor-element-c9303f0>.elementor-container{min-height:160px!important;display:flex!important;align-items:center!important}
@@ -32,14 +61,32 @@ img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded){display:flex!important;align-items:center!important;overflow:hidden!important;gap:10px!important;direction:ltr!important;width:100%!important}
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex:0 0 calc((100% - 30px)/4)!important;min-width:0!important;max-width:calc((100% - 30px)/4)!important}
 
-/* Form select caret: draw it with CSS instead of an icon-font glyph.
-   This preserves the exact Elementor placement while preventing tofu squares. */
+/* Form select caret: draw it with CSS instead of an icon-font glyph. */
 .elementor-select-wrapper .select-caret-down-wrapper{inset-inline-end:10px!important;top:50%!important;transform:translateY(-50%)!important;pointer-events:none!important;display:flex!important;align-items:center!important;justify-content:center!important;width:20px!important;height:28px!important;color:inherit!important}
 .elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down{font-family:inherit!important;font-size:0!important;line-height:1!important;width:12px!important;height:12px!important;display:block!important;position:relative!important}
 .elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down:before{content:""!important;display:block!important;width:8px!important;height:8px!important;border-right:1.6px solid currentColor!important;border-bottom:1.6px solid currentColor!important;transform:rotate(45deg)!important;transform-origin:center!important;margin:0 auto 4px!important;box-sizing:border-box!important}
-
-/* Generic chevrons/arrows used in navigation: never show a missing-font square. */
 .fa-chevron-down:before{content:""!important;display:inline-block!important;width:.48em!important;height:.48em!important;border-right:.12em solid currentColor!important;border-bottom:.12em solid currentColor!important;transform:rotate(45deg)!important;vertical-align:.18em!important}
+
+/* Mobile/off-canvas Services submenu fallback, matching the reference MeanMenu behavior. */
+.offcanvas__menu .menu-item-40652{position:relative!important}
+.offcanvas__menu .menu-item-40652>.main-dropdown-menu{margin:0!important;padding:0!important;list-style:none!important}
+.offcanvas__menu .menu-item-40652>.main-dropdown-menu>li{margin:0!important;padding:0!important;list-style:none!important}
+.nashar-services-toggle{display:none}
+@media (max-width:1199px){
+  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.main-dropdown-menu{display:none!important}
+  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652.services-mobile-open>.main-dropdown-menu{display:block!important}
+  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.nashar-services-toggle{
+    display:flex!important;position:absolute!important;left:0!important;right:auto!important;top:0!important;
+    width:52px!important;height:62px!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+    color:inherit!important;align-items:center!important;justify-content:center!important;z-index:3!important;cursor:pointer!important;
+  }
+  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.nashar-services-toggle:before{
+    content:""!important;width:9px!important;height:9px!important;border-right:1.5px solid currentColor!important;border-bottom:1.5px solid currentColor!important;
+    transform:rotate(45deg)!important;transition:transform .25s ease!important;box-sizing:border-box!important;
+  }
+  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652.services-mobile-open>.nashar-services-toggle:before{transform:rotate(225deg)!important}
+  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.main-dropdown-menu a{font-size:.58em!important;padding-top:12px!important;padding-bottom:12px!important}
+}
 
 @media (min-width:768px){
   .elementor-37155 .elementor-element.elementor-element-dde27c0{width:30%!important}
