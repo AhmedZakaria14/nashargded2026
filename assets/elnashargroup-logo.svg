@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 325" role="img" aria-labelledby="title desc">
+  <title id="title">ELNASHARGROUP</title>
+  <desc id="desc">ELNASHARGROUP white wordmark with a blue to purple geometric emblem</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22D7FF"/>
+      <stop offset="0.52" stop-color="#368CFF"/>
+      <stop offset="1" stop-color="#7357FF"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#6950FF"/>
+      <stop offset="1" stop-color="#24D2FF"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(22 28)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38 225V48h151l-57 52H91v38h101l-55 51H91v36z" stroke="url(#g)" stroke-width="18"/>
+    <path d="M194 47v178L82 134l58-51 0 72 54 45" stroke="url(#g2)" stroke-width="18"/>
+    <path d="M42 245h157" stroke="url(#g)" stroke-width="14" opacity=".92"/>
+  </g>
+  <text x="285" y="205" fill="#FFFFFF" font-family="Arial,Helvetica,sans-serif" font-size="92" font-weight="800" letter-spacing="3.2">ELNASHARGROUP</text>
+</svg>
