@@ -1,4 +1,4 @@
-/* asset recovery v4: force original media and delayed JS to load on clone */
+/* asset recovery v6: force original media and delayed JS to load on clone */
 (function(){
   'use strict';
   const ORIGIN='https://adselams.com/';
@@ -37,6 +37,27 @@
     (root||document).querySelectorAll('img[data-src],img[data-srcset],source[data-src],source[data-srcset],iframe[data-src],video[data-src],video[data-poster],[data-bg],[data-bg-hidpi]').forEach(restoreElement);
   }
 
+  function stabilizeReferenceAreas(){
+    const logo=document.querySelector('.header__logo-2 img[alt="logo"]');
+    if(logo){
+      if(!logo.src || logo.src.startsWith('data:')) logo.src='/origin/wp-content/uploads/2024/09/Adsela-new-logo2.png.webp';
+      logo.style.setProperty('height','55px','important');
+      logo.style.setProperty('width','auto','important');
+      logo.style.setProperty('object-fit','contain','important');
+    }
+    const partner=document.getElementById('uc_logo_carousel_elementor_c98c777');
+    if(partner){
+      partner.querySelectorAll('img').forEach(img=>{
+        const original=img.getAttribute('data-src');
+        if(original) img.src=proxy(original);
+        img.style.setProperty('object-fit','contain','important');
+        img.style.setProperty('object-position','center','important');
+        img.style.setProperty('visibility','visible','important');
+        img.style.setProperty('opacity','1','important');
+      });
+    }
+  }
+
   function rewriteDelayedScriptSources(){
     document.querySelectorAll('script[type="litespeed/javascript"][data-src]').forEach(s=>{
       const u=s.getAttribute('data-src');
@@ -63,6 +84,7 @@
       }
       document.dispatchEvent(new Event('DOMContentLiteSpeedLoaded'));
       window.dispatchEvent(new Event('DOMContentLiteSpeedLoaded'));
+      stabilizeReferenceAreas();
     };
     run();
   }
@@ -70,9 +92,9 @@
   function fixBrokenImages(){
     document.querySelectorAll('img').forEach(img=>{
       img.addEventListener('error',function(){
-        const original=this.getAttribute('data-original-src')||this.currentSrc||this.src;
-        if(original&&original.includes('/origin/')){
-          const direct=ORIGIN+original.split('/origin/')[1];
+        const current=this.currentSrc||this.src;
+        if(current&&current.includes('/origin/')){
+          const direct=ORIGIN+current.split('/origin/')[1];
           if(this.src!==direct){this.src=direct;return;}
         }
         this.style.visibility='hidden';
@@ -82,10 +104,13 @@
 
   const start=()=>{
     restoreMedia(document);
+    stabilizeReferenceAreas();
     rewriteDelayedScriptSources();
     fixBrokenImages();
     setTimeout(forceDelayedScripts,30);
-    const mo=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){restoreElement(n);restoreMedia(n)}})));
+    setTimeout(stabilizeReferenceAreas,250);
+    setTimeout(stabilizeReferenceAreas,1200);
+    const mo=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){restoreElement(n);restoreMedia(n);stabilizeReferenceAreas()}})));
     mo.observe(document.documentElement,{childList:true,subtree:true});
   };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
