@@ -4,6 +4,21 @@
 .offcanvas__logo,
 .offcanvas__logo>a{overflow:visible!important;min-width:0!important;flex-shrink:0!important}
 
+/* Absolute guard: an old Adsela logo may never be visible, even for a single frame. */
+img[src*="Adsela-new-logo" i],
+img[src*="adsela-new-logo" i],
+img[src*="Adsela-Logo" i],
+img[src*="logo-adsela" i],
+img[src*="adsela-icon-footer" i],
+img[data-src*="Adsela-new-logo" i],
+img[data-src*="adsela-new-logo" i],
+img[data-src*="Adsela-Logo" i],
+img[data-src*="logo-adsela" i],
+img[data-src*="adsela-icon-footer" i]{visibility:hidden!important;opacity:0!important}
+
+img[src*="elnashargroup-logo-v3"],img[data-elnashar-brand="logo"]{visibility:visible!important;opacity:1!important}
+img[src*="elnashargroup-icon-v3"],img[data-elnashar-brand="icon"]{visibility:visible!important;opacity:1!important}
+
 .header__logo-2 img[src*="elnashargroup-logo"],
 .header__logo-2 img[alt="logo"],
 .header__logo-2 img[alt="ELNASHARGROUP"],
@@ -47,6 +62,8 @@ footer img[data-elnashar-brand="logo"]{
   visibility:visible!important;
   opacity:1!important;
 }
+
+[style*="logo-adsela" i],[style*="Adsela-new-logo" i],[style*="adsela-icon-footer" i]{background-image:url('/assets/elnashargroup-icon-v3.svg')!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center!important}
 
 @media(max-width:767px){
   .header__logo-2 img[src*="elnashargroup-logo"],
