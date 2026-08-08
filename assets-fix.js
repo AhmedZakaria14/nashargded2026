@@ -1,8 +1,7 @@
-/* asset recovery v10: restore original media/scripts without fighting branding or menu controllers */
+/* asset recovery v12: restore original media/scripts only; branding and menus are handled by dedicated controllers */
 (function(){
   'use strict';
   const ORIGIN='https://adselams.com/';
-  const BRAND_LOGO='/assets/elnashargroup-logo.svg';
   const OLD_BRAND_RE=/(adsela-new-logo2|adsela[-_ ]?logo|logo-adsela|adsela-icon-footer|cropped-fav-icon|logo-png-white-01)/i;
 
   const proxy=(url)=>{
@@ -17,29 +16,10 @@
     return OLD_BRAND_RE.test(hay) || /^logo$/i.test((el.getAttribute('alt')||'').trim()) || /^ELNASHARGROUP$/i.test((el.getAttribute('alt')||'').trim());
   }
 
-  function lockHeaderBrand(el){
-    if(!el||el.tagName!=='IMG') return;
-    el.setAttribute('src',BRAND_LOGO);
-    el.setAttribute('alt','ELNASHARGROUP');
-    el.removeAttribute('srcset');
-    el.removeAttribute('data-src');
-    el.removeAttribute('data-srcset');
-    el.removeAttribute('data-sizes');
-    el.style.setProperty('height','55px','important');
-    el.style.setProperty('width','auto','important');
-    el.style.setProperty('max-width','240px','important');
-    el.style.setProperty('object-fit','contain','important');
-    el.style.setProperty('object-position','center','important');
-    el.style.setProperty('visibility','visible','important');
-    el.style.setProperty('opacity','1','important');
-  }
-
   function restoreElement(el){
     if(!el||!el.getAttribute) return;
-    if(isBrandImage(el)){
-      lockHeaderBrand(el);
-      return;
-    }
+    /* Never resize, rewrite or hide brand images here. brand-fix.js owns them. */
+    if(isBrandImage(el)) return;
     const ds=el.getAttribute('data-src');
     const dss=el.getAttribute('data-srcset');
     const dsz=el.getAttribute('data-sizes');
@@ -68,10 +48,10 @@
   }
 
   function stabilizeReferenceAreas(){
-    document.querySelectorAll('.header__logo-2 img[alt="logo"],.header__logo-2 img[alt="ELNASHARGROUP"],header img[data-src*="Adsela-new-logo2"],header img[src*="Adsela-new-logo2"]').forEach(lockHeaderBrand);
     const partner=document.getElementById('uc_logo_carousel_elementor_c98c777');
     if(partner){
       partner.querySelectorAll('img').forEach(img=>{
+        if(isBrandImage(img)) return;
         const original=img.getAttribute('data-src');
         if(original) img.src=proxy(original);
         img.style.setProperty('object-fit','contain','important');
@@ -118,10 +98,7 @@
       if(img.dataset.assetErrorFix) return;
       img.dataset.assetErrorFix='1';
       img.addEventListener('error',function(){
-        if(isBrandImage(this)){
-          lockHeaderBrand(this);
-          return;
-        }
+        if(isBrandImage(this)) return;
         const current=this.currentSrc||this.src;
         if(current&&current.includes('/origin/')){
           const direct=ORIGIN+current.split('/origin/')[1];
