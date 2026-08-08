@@ -1,4 +1,4 @@
-/* Exact-appearance compatibility layer for the saved homepage. Loaded last. */
+/* Exact-appearance compatibility layer for the saved homepage. Loaded after the original UCSS. */
 @font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-solid-900.woff2') format('woff2')}
 @font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-regular-400.woff2') format('woff2')}
 @font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-brands-400.woff2') format('woff2')}
@@ -10,31 +10,42 @@
 .fas{font-family:"Font Awesome 5 Free"!important;font-weight:900!important;font-style:normal!important}
 .fab{font-family:"Font Awesome 5 Brands"!important;font-weight:400!important;font-style:normal!important}
 [class^="eicon"],[class*=" eicon"]{font-family:eicons!important;font-style:normal!important;font-weight:400!important}
+.fa-arrow-left:before{content:"\f060"!important}.fa-arrow-right:before{content:"\f061"!important}.fa-arrow-up:before{content:"\f062"!important}.fa-check:before{content:"\f00c"!important}.fa-magnifying-glass:before,.fa-search:before{content:"\f002"!important}.fa-star:before{content:"\f005"!important}.fa-xmark:before,.fa-times:before{content:"\f00d"!important}.fa-chevron-left:before{content:"\f053"!important}.fa-chevron-right:before{content:"\f054"!important}.fa-facebook:before{content:"\f09a"!important}.fa-instagram:before{content:"\f16d"!important}.fa-linkedin:before{content:"\f08c"!important}.fa-snapchat:before{content:"\f2ab"!important}.fa-youtube:before{content:"\f167"!important}.fa-x-twitter{font-family:Arial,Helvetica,sans-serif!important;font-weight:700!important}.fa-x-twitter:before{content:"X"!important;font-family:Arial,Helvetica,sans-serif!important;font-weight:700!important}.eicon-caret-down:before{content:"\e92a"!important}
+.elementor-social-icon i{display:block!important;line-height:1!important}.elementor-social-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15s ease}img[src^="/origin/"],img[src^="https://adselams.com/"]{opacity:1!important;visibility:visible!important}
 
-.fa-arrow-left:before{content:"\f060"!important}
-.fa-arrow-right:before{content:"\f061"!important}
-.fa-arrow-up:before{content:"\f062"!important}
-.fa-check:before{content:"\f00c"!important}
-.fa-magnifying-glass:before,.fa-search:before{content:"\f002"!important}
-.fa-star:before{content:"\f005"!important}
-.fa-xmark:before,.fa-times:before{content:"\f00d"!important}
-.fa-chevron-left:before{content:"\f053"!important}
-.fa-chevron-right:before{content:"\f054"!important}
-.fa-facebook:before{content:"\f09a"!important}
-.fa-instagram:before{content:"\f16d"!important}
-.fa-linkedin:before{content:"\f08c"!important}
-.fa-snapchat:before{content:"\f2ab"!important}
-.fa-youtube:before{content:"\f167"!important}
-/* X is not present in the older FA5 brand face; render it with a clean vector-like text mark. */
-.fa-x-twitter{font-family:Arial,Helvetica,sans-serif!important;font-weight:700!important}
-.fa-x-twitter:before{content:"X"!important;font-family:Arial,Helvetica,sans-serif!important;font-weight:700!important}
+/* Header logo: exact size used by the reference HTML (inline height:55px). */
+.header__logo-2{display:flex!important;align-items:center!important;min-width:0!important}
+.header__logo-2>a{display:flex!important;align-items:center!important;width:auto!important;max-width:100%!important}
+.header__logo-2 img[alt="logo"]{display:block!important;height:55px!important;width:auto!important;max-width:none!important;min-width:0!important;object-fit:contain!important;object-position:center!important;margin:0!important}
 
-.eicon-caret-down:before{content:"\e92a"!important}
+/* Exact reference proportions for “نفتخر أيضا بشراكاتنا مع”. */
+.elementor-37155 .elementor-element.elementor-element-c9303f0{margin-top:0!important;margin-bottom:0!important;padding:0!important;border-style:none!important;background:#000!important}
+.elementor-37155 .elementor-element.elementor-element-c9303f0>.elementor-container{min-height:160px!important;display:flex!important;align-items:center!important}
+.elementor-37155 .elementor-element.elementor-element-dde27c0.elementor-column>.elementor-widget-wrap,.elementor-37155 .elementor-element.elementor-element-8e5afd7.elementor-column>.elementor-widget-wrap{align-content:center!important;align-items:center!important}
+.elementor-37155 .elementor-element.elementor-element-32fac31 .sec-title{color:#fff!important;font-size:38px!important;line-height:1.25!important;margin:0!important}
+.elementor-37155 .elementor-element.elementor-element-c98c777 .uc_logo_carousel_holder{height:200px!important;border-radius:0!important;padding:20px!important;border-style:none!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder a{height:100%!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#uc_logo_carousel_elementor_c98c777 img{height:100%!important;width:100%!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;display:block!important}
 
-/* Keep social buttons identical in geometry while preventing tofu squares. */
-.elementor-social-icon i{display:block!important;line-height:1!important}
-.elementor-social-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+/* Same initial presentation as Owl Carousel if its JS is still loading: 4 desktop, 2 tablet/mobile, 10px gap. */
+#uc_logo_carousel_elementor_c98c777:not(.owl-loaded){display:flex!important;align-items:center!important;overflow:hidden!important;gap:10px!important;direction:ltr!important;width:100%!important}
+#uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex:0 0 calc((100% - 30px)/4)!important;min-width:0!important;max-width:calc((100% - 30px)/4)!important}
 
-/* Do not let transparent LiteSpeed placeholders remain visible after a real image is assigned. */
-img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15s ease}
-img[src^="/origin/"],img[src^="https://adselams.com/"]{opacity:1!important;visibility:visible!important}
+@media (min-width:768px){
+  .elementor-37155 .elementor-element.elementor-element-dde27c0{width:30%!important}
+  .elementor-37155 .elementor-element.elementor-element-8e5afd7{width:70%!important}
+  .elementor-37155 .elementor-element.elementor-element-8e5afd7>.elementor-element-populated{margin:0 30px 0 0!important;--e-column-margin-right:30px!important;--e-column-margin-left:0px!important}
+  .elementor-37155 .elementor-element.elementor-element-32fac31 .sec-title{text-align:right!important}
+}
+@media (min-width:768px) and (max-width:979px){
+  #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex-basis:calc((100% - 10px)/2)!important;max-width:calc((100% - 10px)/2)!important}
+}
+@media (max-width:767px){
+  .header__logo-2 img[alt="logo"]{height:55px!important;width:auto!important;max-width:min(203px,65vw)!important}
+  .elementor-37155 .elementor-element.elementor-element-c9303f0>.elementor-container{display:flex!important;flex-direction:column!important;min-height:160px!important;align-items:stretch!important}
+  .elementor-37155 .elementor-element.elementor-element-dde27c0,.elementor-37155 .elementor-element.elementor-element-8e5afd7{width:100%!important}
+  .elementor-37155 .elementor-element.elementor-element-8e5afd7>.elementor-element-populated{margin:0!important;--e-column-margin-right:0px!important;--e-column-margin-left:0px!important}
+  .elementor-37155 .elementor-element.elementor-element-32fac31 .sec-title{text-align:center!important;font-size:38px!important;padding:18px 12px 0!important}
+  #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex-basis:calc((100% - 10px)/2)!important;max-width:calc((100% - 10px)/2)!important}
+}
