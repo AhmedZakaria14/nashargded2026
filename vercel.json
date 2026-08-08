@@ -1,8 +1,73 @@
 {
   "cleanUrls": true,
   "trailingSlash": true,
+  "headers": [
+    {
+      "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
+      ]
+    },
+    {
+      "source": "/home-v3.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    },
+    {
+      "source": "/exact-source/",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    },
+    {
+      "source": "/assets/elnashargroup-logo-v3.svg",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/assets/elnashargroup-icon-v3.svg",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
   "rewrites": [
-    { "source": "/", "destination": "/home.html" },
+    { "source": "/", "destination": "/home-v3.html" },
+
+    { "source": "/wp-content/uploads/:year/:month/Adsela-new-logo2.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/Adsela-new-logo2.png.webp", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/adsela-new-logo.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/Adsela-Logo.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/logo-png-white-01.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/adsela-icon-footer.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/adsela-icon-footer.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/adsela-icon-footer11.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/logo-adsela-half.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/logo-adsela-half.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/logo-adsela-half-right.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/logo-adsela-half-right.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/cropped-fav-icon-1-32x32.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/wp-content/uploads/:year/:month/cropped-fav-icon-1-192x192.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+
+    { "source": "/origin/wp-content/uploads/:year/:month/Adsela-new-logo2.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/Adsela-new-logo2.png.webp", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/adsela-new-logo.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/Adsela-Logo.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/logo-png-white-01.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/adsela-icon-footer.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/adsela-icon-footer.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/adsela-icon-footer11.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/logo-adsela-half.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/logo-adsela-half.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/logo-adsela-half-right.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/logo-adsela-half-right.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-32x32.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+    { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-192x192.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
+
     { "source": "/exact-source/", "destination": "/index.html" },
     { "source": "/origin/:path*", "destination": "https://adselams.com/:path*" },
 
