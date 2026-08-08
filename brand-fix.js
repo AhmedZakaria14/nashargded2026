@@ -1,4 +1,4 @@
-/* ELNASHARGROUP identity layer: one stable source for all brand marks. */
+/* ELNASHARGROUP identity layer: one stable source and responsive, non-clipping sizing for every brand mark. */
 (function(){
   'use strict';
   const BRAND_LOGO='/assets/elnashargroup-logo.svg';
@@ -16,21 +16,63 @@
     return /(icon-footer|cropped-fav|logo-adsela-half|logo-png-white-01)/i.test(sourceText(img));
   }
 
+  function openBrandContainers(img){
+    const containers=[
+      img.parentElement,
+      img.closest('.header__logo-2'),
+      img.closest('.offcanvas__logo'),
+      img.closest('.footer__logo'),
+      img.closest('.footer__logo-2'),
+      img.closest('.elnashar-brand')
+    ].filter(Boolean);
+    containers.forEach(el=>{
+      el.style.setProperty('overflow','visible','important');
+      el.style.setProperty('min-width','0','important');
+      el.style.setProperty('flex-shrink','0','important');
+    });
+    const anchor=img.closest('a');
+    if(anchor){
+      anchor.style.setProperty('display','flex','important');
+      anchor.style.setProperty('align-items','center','important');
+      anchor.style.setProperty('overflow','visible','important');
+      anchor.style.setProperty('flex-shrink','0','important');
+    }
+  }
+
   function sizeBrand(img,isIcon){
+    img.classList.add('elnashar-brand-image');
+    img.removeAttribute('width');
+    img.removeAttribute('height');
+    img.style.setProperty('display','block','important');
+    img.style.setProperty('height','auto','important');
+    img.style.setProperty('max-height','none','important');
+    img.style.setProperty('max-width','none','important');
     img.style.setProperty('object-fit','contain','important');
     img.style.setProperty('object-position','center','important');
     img.style.setProperty('visibility','visible','important');
     img.style.setProperty('opacity','1','important');
-    if(img.closest('.header__logo-2,.header__area-2,header')){
-      img.style.setProperty('height','55px','important');
-      img.style.setProperty('width','auto','important');
-      img.style.setProperty('max-width',isIcon?'55px':'240px','important');
-    }else if(img.closest('footer,.footer__area,.footer__area-2')){
-      img.style.setProperty('max-height',isIcon?'64px':'72px','important');
-      img.style.setProperty('height','auto','important');
-      img.style.setProperty('width','auto','important');
-      img.style.setProperty('max-width',isIcon?'64px':'275px','important');
+    img.style.setProperty('clip-path','none','important');
+    img.style.setProperty('transform','none','important');
+
+    const inHeader=!!img.closest('.header__logo-2,.header__area-2,header');
+    const inOffcanvas=!!img.closest('.offcanvas__area,.offcanvas__menu,.offcanvas__logo');
+    const inFooter=!!img.closest('footer,.footer__area,.footer__area-2,.footer__logo,.footer__logo-2');
+
+    if(isIcon){
+      if(inHeader) img.style.setProperty('width','48px','important');
+      else if(inOffcanvas) img.style.setProperty('width','56px','important');
+      else img.style.setProperty('width','64px','important');
+    }else if(inHeader){
+      /* 230px desktop; automatically shrinks on narrow phones while preserving the full aspect ratio. */
+      img.style.setProperty('width','min(230px,52vw)','important');
+    }else if(inOffcanvas){
+      img.style.setProperty('width','min(240px,72vw)','important');
+    }else if(inFooter){
+      img.style.setProperty('width','min(285px,82vw)','important');
+    }else{
+      img.style.setProperty('width','min(245px,75vw)','important');
     }
+    openBrandContainers(img);
   }
 
   function replaceBrandImage(img){
