@@ -1,0 +1,40 @@
+/* Exact-appearance compatibility layer for the saved homepage. Loaded last. */
+@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-solid-900.woff2') format('woff2')}
+@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-regular-400.woff2') format('woff2')}
+@font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-brands-400.woff2') format('woff2')}
+@font-face{font-family:"Font Awesome 5 Free";font-style:normal;font-weight:900;font-display:block;src:url('/origin/wp-content/plugins/elementor/assets/lib/font-awesome/webfonts/fa-solid-900.woff2') format('woff2')}
+@font-face{font-family:"Font Awesome 5 Brands";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/elementor/assets/lib/font-awesome/webfonts/fa-brands-400.woff2') format('woff2')}
+@font-face{font-family:eicons;font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons_5.43.0.woff2') format('woff2')}
+
+.fa-solid{font-family:"Font Awesome 6 Free"!important;font-weight:900!important;font-style:normal!important}
+.fas{font-family:"Font Awesome 5 Free"!important;font-weight:900!important;font-style:normal!important}
+.fab{font-family:"Font Awesome 5 Brands"!important;font-weight:400!important;font-style:normal!important}
+[class^="eicon"],[class*=" eicon"]{font-family:eicons!important;font-style:normal!important;font-weight:400!important}
+
+.fa-arrow-left:before{content:"\f060"!important}
+.fa-arrow-right:before{content:"\f061"!important}
+.fa-arrow-up:before{content:"\f062"!important}
+.fa-check:before{content:"\f00c"!important}
+.fa-magnifying-glass:before,.fa-search:before{content:"\f002"!important}
+.fa-star:before{content:"\f005"!important}
+.fa-xmark:before,.fa-times:before{content:"\f00d"!important}
+.fa-chevron-left:before{content:"\f053"!important}
+.fa-chevron-right:before{content:"\f054"!important}
+.fa-facebook:before{content:"\f09a"!important}
+.fa-instagram:before{content:"\f16d"!important}
+.fa-linkedin:before{content:"\f08c"!important}
+.fa-snapchat:before{content:"\f2ab"!important}
+.fa-youtube:before{content:"\f167"!important}
+/* X is not present in the older FA5 brand face; render it with a clean vector-like text mark. */
+.fa-x-twitter{font-family:Arial,Helvetica,sans-serif!important;font-weight:700!important}
+.fa-x-twitter:before{content:"X"!important;font-family:Arial,Helvetica,sans-serif!important;font-weight:700!important}
+
+.eicon-caret-down:before{content:"\e92a"!important}
+
+/* Keep social buttons identical in geometry while preventing tofu squares. */
+.elementor-social-icon i{display:block!important;line-height:1!important}
+.elementor-social-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+
+/* Do not let transparent LiteSpeed placeholders remain visible after a real image is assigned. */
+img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15s ease}
+img[src^="/origin/"],img[src^="https://adselams.com/"]{opacity:1!important;visibility:visible!important}
