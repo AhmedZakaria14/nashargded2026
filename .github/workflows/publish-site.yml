@@ -1,0 +1,60 @@
+name: Publish static site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/site
+          mkdir -p /tmp/site
+          wget \
+            --page-requisites \
+            --convert-links \
+            --adjust-extension \
+            --no-host-directories \
+            --directory-prefix=/tmp/site \
+            --execute robots=off \
+            --user-agent='Mozilla/5.0' \
+            'https://adselams.com/'
+          test -f /tmp/site/index.html
+
+      - name: Copy site into repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            /tmp/site/ ./
+
+      - name: Commit published site
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No site changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Publish Adsela static site'
+          git push origin HEAD:main
