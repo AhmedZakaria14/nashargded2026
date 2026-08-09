@@ -1,0 +1,95 @@
+/* Final light-mode authority layer. Loaded last. Dark mode is untouched. */
+html[data-theme="light"] body{background:#f8fafc!important;color:#111827!important}
+html[data-theme="light"] body.rtl .elementor-37155,
+html[data-theme="light"] body.rtl .elementor-37155>.elementor-section,
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-section.elementor-element,
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-container,
+html[data-theme="light"] body.rtl .elementor-37155 .e-con,
+html[data-theme="light"] body.rtl .elementor-37155 .e-con-inner,
+html[data-theme="light"] body.rtl #smooth-wrapper,
+html[data-theme="light"] body.rtl #smooth-content{background-color:#f8fafc!important;color:#111827!important}
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-section.elementor-element:nth-of-type(even){background-color:#fff!important}
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-column,
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-widget-wrap,
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-widget-container{color:#111827!important}
+html[data-theme="light"] body.rtl .elementor-37155 h1,
+html[data-theme="light"] body.rtl .elementor-37155 h2,
+html[data-theme="light"] body.rtl .elementor-37155 h3,
+html[data-theme="light"] body.rtl .elementor-37155 h4,
+html[data-theme="light"] body.rtl .elementor-37155 h5,
+html[data-theme="light"] body.rtl .elementor-37155 h6,
+html[data-theme="light"] body.rtl .elementor-37155 .sec-title,
+html[data-theme="light"] body.rtl .elementor-37155 .title-anim{color:#111827!important;text-shadow:none!important}
+html[data-theme="light"] body.rtl .elementor-37155 p,
+html[data-theme="light"] body.rtl .elementor-37155 li,
+html[data-theme="light"] body.rtl .elementor-37155 .sec-sub-title{color:#475569!important}
+
+/* Keep imagery visible while removing dark overlays that recreate night mode. */
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-background-overlay{background-color:transparent!important;opacity:.06!important}
+html[data-theme="light"] body.rtl .elementor-37155 [data-settings*="background_background"]{background-color:#f8fafc!important}
+
+/* Original header */
+html[data-theme="light"] body.rtl .header__area-2,
+html[data-theme="light"] body.rtl .header__inner-2{background:rgba(255,255,255,.94)!important;color:#111827!important}
+html[data-theme="light"] body.rtl .header__area-2{box-shadow:0 1px 0 rgba(15,23,42,.08),0 10px 35px rgba(15,23,42,.05)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important}
+html[data-theme="light"] body.rtl .header__nav-2 .main-menu>li>a{color:#111827!important}
+html[data-theme="light"] body.rtl .header__nav-2 .main-dropdown{background:#fff!important;color:#111827!important;border:1px solid #e2e8f0!important;box-shadow:0 22px 60px rgba(15,23,42,.14)!important}
+html[data-theme="light"] body.rtl .header__nav-2 .main-dropdown a{color:#111827!important}
+
+/* Offcanvas / mobile */
+html[data-theme="light"] body.rtl .offcanvas__area,
+html[data-theme="light"] body.rtl .offcanvas__body,
+html[data-theme="light"] body.rtl .offcanvas__left,
+html[data-theme="light"] body.rtl .offcanvas__mid,
+html[data-theme="light"] body.rtl .offcanvas__right,
+html[data-theme="light"] body.rtl .offcanvas__menu-wrapper{background:#fff!important;color:#111827!important}
+html[data-theme="light"] body.rtl .offcanvas__area a,
+html[data-theme="light"] body.rtl .offcanvas__area p,
+html[data-theme="light"] body.rtl .offcanvas__area li{color:#111827!important}
+
+/* Forms and partner cards */
+html[data-theme="light"] body.rtl input,
+html[data-theme="light"] body.rtl textarea,
+html[data-theme="light"] body.rtl select{background:#fff!important;color:#111827!important;border-color:#cbd5e1!important}
+html[data-theme="light"] body.rtl #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 28px rgba(15,23,42,.06)!important}
+html[data-theme="light"] body.rtl .elementor-37155 .elementor-element.elementor-element-c9303f0{background:#f8fafc!important}
+
+/* SPA / all internal routes */
+html[data-theme="light"] .site-header{background:rgba(255,255,255,.94)!important;color:#111827!important}
+html[data-theme="light"] .site-header.scrolled{background:rgba(255,255,255,.96)!important;color:#111827!important}
+html[data-theme="light"] .hero,
+html[data-theme="light"] .services-dark,
+html[data-theme="light"] .visual-card,
+html[data-theme="light"] .site-footer,
+html[data-theme="light"] .mobile-menu,
+html[data-theme="light"] .mega-menu{background:#fff!important;color:#111827!important}
+html[data-theme="light"] main,
+html[data-theme="light"] .section{background:#f8fafc;color:#111827}
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .work-card,
+html[data-theme="light"] .blog-card,
+html[data-theme="light"] .detail-card,
+html[data-theme="light"] .contact-card,
+html[data-theme="light"] .faq-item,
+html[data-theme="light"] .career-card,
+html[data-theme="light"] .service-card{background:#fff!important;color:#111827!important;border-color:#e2e8f0!important}
+html[data-theme="light"] .site-footer{border-top:1px solid #e2e8f0!important}
+html[data-theme="light"] .footer-grid a,
+html[data-theme="light"] .footer-grid span,
+html[data-theme="light"] .footer-grid p,
+html[data-theme="light"] .footer-bottom{color:#475569!important}
+html[data-theme="light"] .desktop-nav>a,
+html[data-theme="light"] .nav-drop>a,
+html[data-theme="light"] .lang-btn{color:#111827!important}
+html[data-theme="light"] .menu-toggle{background:#fff!important;border-color:#cbd5e1!important}
+html[data-theme="light"] .menu-toggle i{background:#111827!important}
+
+/* White wordmark stays legible in daytime. */
+html[data-theme="light"] .header__logo-2>a,
+html[data-theme="light"] .offcanvas__logo>a,
+html[data-theme="light"] .site-header .elnashar-brand,
+html[data-theme="light"] .site-footer .elnashar-brand{background:#0b1220!important;border-radius:14px!important;padding:6px 10px!important}
+
+/* Theme control must remain visible on both desktop and mobile. */
+html[data-theme="light"] .theme-toggle{background:#fff!important;color:#111827!important;border-color:#cbd5e1!important}
+html[data-theme="light"] .theme-toggle-item{background:transparent!important}
