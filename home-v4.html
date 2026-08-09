@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="index,follow">
   <meta name="theme-color" content="#07100c">
-  <meta name="description" content="ELNASHARGROUP شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.">
-  <title>ELNASHARGROUP | وكالة تسويق رقمي في السعودية والخليج</title>
+  <meta name="description" content="النشار جروب شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.">
+  <title>النشار جروب | وكالة تسويق رقمي في السعودية والخليج</title>
   <link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">
   <style>html,body{margin:0;background:#000;min-height:100%;color:#fff}#boot{position:fixed;inset:0;background:#000;z-index:2147483647}</style>
 </head>
@@ -15,16 +15,16 @@
 <script>
 (async()=>{
   try{
-    const BRAND='ELNASHARGROUP';
+    const BRAND='النشار جروب';
     const FULL='/assets/elnashargroup-logo-v3.svg';
     const ICON='/assets/elnashargroup-icon-v3.svg';
     const ORIGIN='https://adselams.com/';
     const SITE=location.origin;
     const PATH=location.pathname||'/';
     const IS_HOME=PATH==='/'||PATH==='/home-v4.html';
-    const HOME_TITLE='ELNASHARGROUP | وكالة تسويق رقمي في السعودية والخليج';
-    const DEFAULT_DESC='ELNASHARGROUP شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.';
-    const brandText=v=>!v?v:v.replace(/[\w.+-]+@(?:adselams\.com|nashar\.digital)/gi,BRAND).replace(/Adsela\s+Marketing\s+Solutions/gi,BRAND).replace(/\bAdsela\b/gi,BRAND).replace(/أدسيلا|ادسيلا/g,BRAND).replace(/نشار\s+ديجيتال/g,BRAND).replace(/Nashar\s+Digital/gi,BRAND).replace(/(?:www\.)?adselams\.com/gi,BRAND).replace(/(?:www\.)?nashar\.digital/gi,BRAND);
+    const HOME_TITLE='النشار جروب | وكالة تسويق رقمي في السعودية والخليج';
+    const DEFAULT_DESC='النشار جروب شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.';
+    const brandText=v=>!v?v:v.replace(/[\w.+-]+@(?:adselams\.com|nashar\.digital)/gi,BRAND).replace(/Adsela\s+Marketing\s+Solutions/gi,BRAND).replace(/\bAdsela\b/gi,BRAND).replace(/أدسيلا|ادسيلا/g,BRAND).replace(/نشار\s+ديجيتال/g,BRAND).replace(/Nashar\s+Digital/gi,BRAND).replace(/\bELNASHARGROUP\b/gi,BRAND).replace(/(?:www\.)?adselams\.com/gi,BRAND).replace(/(?:www\.)?nashar\.digital/gi,BRAND);
     const proxy=u=>{
       if(!u||typeof u!=='string')return u;
       const s=u.trim();
@@ -35,7 +35,7 @@
     };
     const setProxy=v=>!v?v:v.split(',').map(part=>{const bits=part.trim().split(/\s+/);if(bits[0])bits[0]=proxy(bits[0]);return bits.join(' ')}).join(', ');
 
-    const sourceUrl=IS_HOME?'/exact-source/?media=clone-stable-v1':('/origin'+PATH+(location.search||''));
+    const sourceUrl=IS_HOME?'/exact-source/?media=clone-stable-v2':('/origin'+PATH+(location.search||''));
     const r=await fetch(sourceUrl,{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
     if(!r.ok)throw new Error('source '+r.status+' '+sourceUrl);
     let h=await r.text();
@@ -74,7 +74,7 @@
       ['srcset','data-src','data-lazy-src','data-original','data-srcset','data-lazy-srcset','data-sizes','loading','width','height'].forEach(a=>img.removeAttribute(a));
       img.dataset.elnasharBrand=src===FULL?'logo':'icon';
     };
-    d.querySelectorAll('.header__logo-2 img,.offcanvas__logo img,.footer__logo img,.footer__logo-2 img,.site-header .brand img,header img[alt="logo"],header img[alt="ELNASHARGROUP"],footer img[alt="logo"],footer img[alt="ELNASHARGROUP"]').forEach(img=>cleanImg(img,FULL));
+    d.querySelectorAll('.header__logo-2 img,.offcanvas__logo img,.footer__logo img,.footer__logo-2 img,.site-header .brand img,header img[alt="logo"],header img[alt="ELNASHARGROUP"],header img[alt="النشار جروب"],footer img[alt="logo"],footer img[alt="ELNASHARGROUP"],footer img[alt="النشار جروب"]').forEach(img=>cleanImg(img,FULL));
     d.querySelectorAll('.header__logo-2 source,.offcanvas__logo source,.footer__logo source,.footer__logo-2 source').forEach(s=>{s.setAttribute('srcset',FULL);s.removeAttribute('data-srcset');s.removeAttribute('data-lazy-srcset')});
     d.querySelectorAll('.header__logo-2 a,.offcanvas__logo a,.footer__logo a,.footer__logo-2 a,.site-header .brand').forEach(a=>{a.setAttribute('title',BRAND);a.setAttribute('aria-label',BRAND)});
     d.querySelectorAll('link[rel~="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"],link[rel="apple-touch-icon-precomposed"]').forEach(l=>{l.setAttribute('href',ICON);l.setAttribute('type','image/svg+xml')});
@@ -101,7 +101,7 @@
     if(!canonical){canonical=d.createElement('link');canonical.rel='canonical';d.head.appendChild(canonical)}
     canonical.href=SITE+(IS_HOME?'/':PATH);
     d.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{if(/Adsela|ادسيلا|أدسيلا|adselams\.com|nashar\.digital/i.test(s.textContent||''))s.remove()});
-    const schema=d.createElement('script');schema.type='application/ld+json';schema.dataset.elnasharSchema='1';schema.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':SITE+'/#organization',name:BRAND,url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+FULL,contentUrl:SITE+FULL,caption:BRAND}},{'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:BRAND,alternateName:BRAND,publisher:{'@id':SITE+'/#organization'},inLanguage:PATH.startsWith('/en')?'en':'ar'},{'@type':'WebPage','@id':SITE+(IS_HOME?'/':PATH)+'#webpage',url:SITE+(IS_HOME?'/':PATH),name:pageTitle,isPartOf:{'@id':SITE+'/#website'},about:{'@id':SITE+'/#organization'},inLanguage:PATH.startsWith('/en')?'en':'ar'}]});d.head.appendChild(schema);
+    const schema=d.createElement('script');schema.type='application/ld+json';schema.dataset.elnasharSchema='1';schema.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':SITE+'/#organization',name:BRAND,url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+FULL,contentUrl:SITE+FULL,caption:BRAND}},{'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:BRAND,alternateName:'ELNASHARGROUP',publisher:{'@id':SITE+'/#organization'},inLanguage:PATH.startsWith('/en')?'en':'ar'},{'@type':'WebPage','@id':SITE+(IS_HOME?'/':PATH)+'#webpage',url:SITE+(IS_HOME?'/':PATH),name:pageTitle,isPartOf:{'@id':SITE+'/#website'},about:{'@id':SITE+'/#organization'},inLanguage:PATH.startsWith('/en')?'en':'ar'}]});d.head.appendChild(schema);
 
     let out='<!DOCTYPE html>'+d.documentElement.outerHTML;
     const closeScript='</scr'+'ipt>';
@@ -118,8 +118,8 @@
     out=out.replace('</body>',
       '<script src="/assets-fix.js?v=16">'+closeScript+
       '<script src="/services-menu-fix.js?v=2">'+closeScript+
-      '<script src="/brand-fix.js?v=8">'+closeScript+
-      '<script src="/identity-fix.js?v=3">'+closeScript+
+      '<script src="/brand-fix.js?v=9">'+closeScript+
+      '<script src="/identity-fix.js?v=4">'+closeScript+
       '<script src="/partners-owl-guard.js?v=2">'+closeScript+
       '</body>');
     document.open();document.write(out);document.close();
