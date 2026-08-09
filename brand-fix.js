@@ -1,6 +1,7 @@
-/* ELNASHARGROUP identity controller: old Adsela marks can never win in visible brand slots. */
+/* ELNASHARGROUP logo asset controller for النشار جروب: old Adsela marks can never win in visible brand slots. */
 (function(){
   'use strict';
+  const BRAND_NAME='النشار جروب';
   const BRAND_LOGO='/assets/elnashargroup-logo-v3.svg';
   const BRAND_ICON='/assets/elnashargroup-icon-v3.svg';
   const OLD_LOGO_RE=/(adsela(?:[-_ ]?new)?[-_ ]?logo\d*|adsela[-_ ]?logo|logo[-_ ]?adsela|adsela-icon-footer|cropped-fav-icon|logo-png-white-01)/i;
@@ -10,7 +11,7 @@
   function isBrand(img){
     if(!img||img.tagName!=='IMG') return false;
     const s=text(img),alt=(img.getAttribute('alt')||'').trim();
-    return OLD_LOGO_RE.test(s)||/elnashargroup-(?:logo|icon)(?:-v3)?\.svg/i.test(s)||/^logo$/i.test(alt)||/^ELNASHARGROUP$/i.test(alt);
+    return OLD_LOGO_RE.test(s)||/elnashargroup-(?:logo|icon)(?:-v3)?\.svg/i.test(s)||/^logo$/i.test(alt)||/^ELNASHARGROUP$/i.test(alt)||alt===BRAND_NAME;
   }
   function fullSlot(img){return !!img.closest(FULL_SLOT)}
   function iconOnly(img){
@@ -57,7 +58,7 @@
     const icon=iconOnly(img),target=icon?BRAND_ICON:BRAND_LOGO;
     if(img.getAttribute('src')!==target) img.setAttribute('src',target);
     ['srcset','data-src','data-srcset','data-sizes','loading'].forEach(a=>img.removeAttribute(a));
-    img.setAttribute('alt','ELNASHARGROUP');
+    img.setAttribute('alt',BRAND_NAME);
     img.dataset.elnasharBrand=icon?'icon':'logo';
     size(img,icon);
   }
