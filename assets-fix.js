@@ -1,4 +1,4 @@
-/* asset recovery v15: resilient media loading for saved Adsela homepage without fighting branding/menu controllers */
+/* asset recovery v16: resilient media loading for saved Adsela homepage without fighting branding/menu controllers */
 (function(){
   'use strict';
   const ORIGIN='https://adselams.com/';
@@ -52,6 +52,8 @@
   function markReady(el){
     if(!el||el.nodeType!==1) return;
     el.dataset.nasharMediaReady='1';
+    delete el.dataset.nasharMediaError;
+    delete el.dataset.nasharAllowDirect;
     el.style.removeProperty('visibility');
     el.style.removeProperty('opacity');
   }
@@ -89,7 +91,7 @@
       remember(el,lazySrc);
       if(isPlaceholder(current)||current!==proxy(lazySrc)) el.setAttribute('src',proxy(lazySrc));
       ['data-src','data-lazy-src','data-original','data-lazyload'].forEach(a=>el.removeAttribute(a));
-    }else if(current&&/^https?:\/\/adselams\.com\//i.test(current)){
+    }else if(current&&/^https?:\/\/adselams\.com\//i.test(current)&&el.dataset.nasharAllowDirect!=='1'){
       remember(el,current);
       el.setAttribute('src',proxy(current));
     }else if(current&&!isPlaceholder(current)){
@@ -101,7 +103,7 @@
     if(lazySet){
       el.setAttribute('srcset',srcset(lazySet,'proxy'));
       el.removeAttribute('data-srcset');el.removeAttribute('data-lazy-srcset');
-    }else if(currentSet&&/https?:\/\/adselams\.com\//i.test(currentSet)){
+    }else if(currentSet&&/https?:\/\/adselams\.com\//i.test(currentSet)&&el.dataset.nasharAllowDirect!=='1'){
       el.setAttribute('srcset',srcset(currentSet,'proxy'));
     }
 
@@ -153,6 +155,7 @@
     const next=candidates.find(u=>!tried.includes(u));
     if(next){
       tried.push(next);img.dataset.nasharTried=JSON.stringify(tried.slice(-12));
+      if(/^https?:\/\/adselams\.com\//i.test(next)) img.dataset.nasharAllowDirect='1'; else delete img.dataset.nasharAllowDirect;
       img.removeAttribute('srcset');
       img.setAttribute('src',next);
       img.style.removeProperty('visibility');img.style.removeProperty('opacity');
@@ -211,14 +214,11 @@
     run();
   }
 
-  function sweep(){
-    restoreMedia(document);
-    stabilizeReferenceAreas();
-  }
+  function sweep(){restoreMedia(document);stabilizeReferenceAreas()}
 
   function start(){
-    document.addEventListener('load',e=>{if(e.target&&e.target.tagName==='IMG'){delete e.target.dataset.nasharMediaError;markReady(e.target)}},true);
-    document.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG') recoverBrokenImage(e.target)},true);
+    document.addEventListener('load',e=>{if(e.target&&e.target.tagName==='IMG')markReady(e.target)},true);
+    document.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG')recoverBrokenImage(e.target)},true);
     sweep();
     rewriteDelayedScriptSources();
     setTimeout(forceDelayedScripts,80);
