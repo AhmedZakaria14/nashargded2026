@@ -13,9 +13,7 @@ img[data-nashar-media-managed="1"]{
   visibility:visible!important;
   opacity:1!important;
 }
-img[data-nashar-media-managed="1"]{
-  object-position:center;
-}
+img[data-nashar-media-managed="1"]{object-position:center}
 img[data-nashar-media-error="1"]{
   visibility:visible!important;
   opacity:1!important;
@@ -27,9 +25,7 @@ img[data-nashar-media-error="1"]{
 .elementor-widget-image .elementor-widget-container,
 .elementor-widget-image a,
 .elementor-image,
-.elementor-image a{
-  max-width:100%!important;
-}
+.elementor-image a{max-width:100%!important}
 .elementor-widget-image img[data-nashar-media-managed="1"],
 .elementor-image img[data-nashar-media-managed="1"]{
   display:block!important;
@@ -42,20 +38,74 @@ iframe,video{max-width:100%}
 .elementor iframe{max-width:100%!important}
 .elementor video{width:100%;height:auto}
 
-/* Partner logos: stable even before/after Owl Carousel initialises. */
-#uc_logo_carousel_elementor_c98c777,
-#uc_logo_carousel_elementor_c98c777 .owl-stage-outer,
-#uc_logo_carousel_elementor_c98c777 .owl-stage,
-#uc_logo_carousel_elementor_c98c777 .owl-item{min-width:0}
-#uc_logo_carousel_elementor_c98c777 img{
+/* Partner logos — native touch-first carousel. All original logos remain in one horizontal strip. */
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel{
+  display:flex!important;
+  align-items:stretch!important;
+  gap:10px!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  scroll-snap-type:x mandatory!important;
+  scroll-behavior:smooth!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-x!important;
+  overscroll-behavior-x:contain!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  direction:ltr!important;
+  cursor:grab!important;
+  transform:none!important;
+  padding:0!important;
+}
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel:active{cursor:grabbing!important}
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel>.nashar-partner-item{
+  flex:0 0 calc((100% - 30px)/4)!important;
+  width:calc((100% - 30px)/4)!important;
+  max-width:calc((100% - 30px)/4)!important;
+  min-width:0!important;
+  margin:0!important;
+  transform:none!important;
+  scroll-snap-align:start!important;
+  scroll-snap-stop:normal!important;
+  box-sizing:border-box!important;
+}
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel .uc_logo_carousel_holder{
+  width:100%!important;
+  height:200px!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+}
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel .uc_logo_carousel_holder>a{
+  width:100%!important;
+  height:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel img{
   display:block!important;
   visibility:visible!important;
   opacity:1!important;
+  width:100%!important;
+  height:100%!important;
   max-width:100%!important;
   max-height:100%!important;
   object-fit:contain!important;
   object-position:center!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  -webkit-user-drag:none!important;
 }
+/* Remove any delayed Owl wrappers immediately from layout if they exist during the repair frame. */
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel>.owl-stage-outer,
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel>.owl-nav,
+#uc_logo_carousel_elementor_c98c777.nashar-partners-carousel>.owl-dots{display:none!important}
 
 /* Keep background/overlay media clipped only by their intended section, not by accidental child sizing. */
 .elementor-section,.e-con,.elementor-column,.elementor-widget-wrap{min-width:0}
@@ -67,9 +117,7 @@ img[data-elnashar-brand],
 .header__logo-2 img,
 .offcanvas__logo img,
 .footer__logo img,
-.footer__logo-2 img{
-  object-fit:contain!important;
-}
+.footer__logo-2 img{object-fit:contain!important}
 
 /* Prevent common overflow/cropping issues on tablets and phones. */
 @media(max-width:1199px){
@@ -77,10 +125,32 @@ img[data-elnashar-brand],
   .e-con-inner{max-width:100%}
   .elementor-widget-wrap{min-width:0}
 }
+@media(max-width:979px){
+  #uc_logo_carousel_elementor_c98c777.nashar-partners-carousel{
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scroll-snap-type:x mandatory!important;
+    touch-action:pan-x!important;
+  }
+  #uc_logo_carousel_elementor_c98c777.nashar-partners-carousel>.nashar-partner-item{
+    flex:0 0 calc((100% - 10px)/2)!important;
+    width:calc((100% - 10px)/2)!important;
+    max-width:calc((100% - 10px)/2)!important;
+  }
+}
 @media(max-width:767px){
   body{width:100%;overflow-x:hidden}
   figure{margin-left:0;margin-right:0;max-width:100%}
   .elementor-widget-image img[data-nashar-media-managed="1"],
   .elementor-image img[data-nashar-media-managed="1"]{max-width:100%!important;height:auto!important}
-  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{min-width:0!important}
+  #uc_logo_carousel_elementor_c98c777.nashar-partners-carousel{
+    width:100%!important;
+    max-width:100vw!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  #uc_logo_carousel_elementor_c98c777.nashar-partners-carousel .uc_logo_carousel_holder{
+    height:170px!important;
+    min-height:170px!important;
+  }
 }
