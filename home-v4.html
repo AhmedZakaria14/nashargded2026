@@ -33,7 +33,7 @@
     };
     const setProxy=v=>!v?v:v.split(',').map(part=>{const bits=part.trim().split(/\s+/);if(bits[0])bits[0]=proxy(bits[0]);return bits.join(' ')}).join(', ');
 
-    const r=await fetch('/exact-source/?media=stable-v7',{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    const r=await fetch('/exact-source/?media=stable-v8',{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
     if(!r.ok)throw new Error('source '+r.status);
     let h=await r.text();
 
@@ -54,14 +54,16 @@
       if(/stylesheet|preload|icon/.test(rel))link.setAttribute('href',proxy(link.getAttribute('href')));
     });
 
-    /* Rebrand every visible text node before first paint, while leaving scripts/styles and technical source URLs untouched. */
     const skip=new Set(['SCRIPT','STYLE','NOSCRIPT','CODE','PRE','TEXTAREA']);
     const walker=d.createTreeWalker(d.body,NodeFilter.SHOW_TEXT,{acceptNode(node){const p=node.parentElement;return p&&!skip.has(p.tagName)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
     let tn;while((tn=walker.nextNode())){const n=brandText(tn.nodeValue);if(n!==tn.nodeValue)tn.nodeValue=n}
     d.querySelectorAll('[alt],[title],[aria-label],[placeholder]').forEach(el=>['alt','title','aria-label','placeholder'].forEach(a=>{const v=el.getAttribute(a);if(v){const n=brandText(v);if(n!==v)el.setAttribute(a,n)}}));
 
-    /* Keep internal links local instead of sending visitors back to the source brand domain. */
-    d.querySelectorAll('a[href^="https://adselams.com/"],a[href^="http://adselams.com/"]').forEach(a=>{try{const u=new URL(a.href);a.setAttribute('href',u.pathname+u.search+u.hash)}catch(e){}});
+    d.querySelectorAll('a[href]').forEach(a=>{
+      const href=a.getAttribute('href')||'';
+      if(/^https?:\/\/adselams\.com\//i.test(href)){try{const u=new URL(href);a.setAttribute('href',u.pathname+u.search+u.hash)}catch(e){};return}
+      if(/(?:facebook|instagram|twitter|x|linkedin|tiktok|youtube|snapchat)\.com\/[^"']*adsela/i.test(href)){a.setAttribute('href','/');a.removeAttribute('target');a.setAttribute('aria-label',BRAND)}
+    });
 
     const cleanImg=(img,src)=>{
       img.setAttribute('src',src);img.setAttribute('alt',BRAND);
@@ -74,9 +76,8 @@
     d.querySelectorAll('link[rel~="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"],link[rel="apple-touch-icon-precomposed"]').forEach(l=>{l.setAttribute('href',ICON);l.setAttribute('type','image/svg+xml')});
     d.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute('content','#07100c'));
 
-    /* Replace legacy SEO identity and schema with ELNASHARGROUP. */
     d.title=TITLE;
-    const setMeta=(selector,attr,value)=>{let m=d.querySelector(selector);if(m)m.setAttribute(attr,value)};
+    const setMeta=(selector,attr,value)=>{const m=d.querySelector(selector);if(m)m.setAttribute(attr,value)};
     setMeta('meta[name="description"]','content',DESC);
     setMeta('meta[property="og:title"]','content',TITLE);
     setMeta('meta[property="og:description"]','content',DESC);
@@ -86,6 +87,8 @@
     setMeta('meta[name="twitter:description"]','content',DESC);
     setMeta('meta[property="og:image"]','content',SITE+FULL);
     setMeta('meta[name="twitter:image"]','content',SITE+FULL);
+    d.querySelectorAll('meta[name="twitter:site"],meta[name="twitter:creator"]').forEach(m=>{if(/adsela|adselams/i.test(m.getAttribute('content')||''))m.remove()});
+    d.querySelectorAll('link[rel="alternate"][hreflang]').forEach(l=>{if(/adselams\.com/i.test(l.getAttribute('href')||'')){const lang=(l.getAttribute('hreflang')||'').toLowerCase();l.setAttribute('href',lang==='en'?SITE+'/en/':SITE+'/')}});
     let canonical=d.querySelector('link[rel="canonical"]');
     if(!canonical){canonical=d.createElement('link');canonical.rel='canonical';d.head.appendChild(canonical)}
     canonical.href=SITE+'/';
@@ -107,7 +110,7 @@
       '<script src="/assets-fix.js?v=16">'+closeScript+
       '<script src="/services-menu-fix.js?v=2">'+closeScript+
       '<script src="/brand-fix.js?v=8">'+closeScript+
-      '<script src="/identity-fix.js?v=1">'+closeScript+
+      '<script src="/identity-fix.js?v=2">'+closeScript+
       '<script src="/partners-owl-guard.js?v=2">'+closeScript+
       '</body>');
     document.open();document.write(out);document.close();
