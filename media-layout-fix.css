@@ -1,0 +1,86 @@
+/* Stable responsive media layer — preserves the dark design and prevents image/layout collapse. */
+html,body{max-width:100%;overflow-x:hidden}
+img,svg,video,canvas{vertical-align:middle}
+picture,figure,.elementor-widget-image,.elementor-image{max-width:100%}
+picture img,figure img,.elementor-widget-image img,.elementor-image img{
+  max-width:100%!important;
+  height:auto!important;
+}
+
+/* Images restored by assets-fix.js must never remain hidden by LiteSpeed/Elementor lazy-load states. */
+img[data-nashar-media-ready="1"],
+img[data-nashar-media-managed="1"]{
+  visibility:visible!important;
+  opacity:1!important;
+}
+img[data-nashar-media-managed="1"]{
+  object-position:center;
+}
+img[data-nashar-media-error="1"]{
+  visibility:visible!important;
+  opacity:1!important;
+  min-width:1px;
+  min-height:1px;
+}
+
+/* Do not let lazy-load placeholders shrink image widgets to zero height/width. */
+.elementor-widget-image .elementor-widget-container,
+.elementor-widget-image a,
+.elementor-image,
+.elementor-image a{
+  max-width:100%!important;
+}
+.elementor-widget-image img[data-nashar-media-managed="1"],
+.elementor-image img[data-nashar-media-managed="1"]{
+  display:block!important;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Responsive embeds and visual media. */
+iframe,video{max-width:100%}
+.elementor iframe{max-width:100%!important}
+.elementor video{width:100%;height:auto}
+
+/* Partner logos: stable even before/after Owl Carousel initialises. */
+#uc_logo_carousel_elementor_c98c777,
+#uc_logo_carousel_elementor_c98c777 .owl-stage-outer,
+#uc_logo_carousel_elementor_c98c777 .owl-stage,
+#uc_logo_carousel_elementor_c98c777 .owl-item{min-width:0}
+#uc_logo_carousel_elementor_c98c777 img{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+
+/* Keep background/overlay media clipped only by their intended section, not by accidental child sizing. */
+.elementor-section,.e-con,.elementor-column,.elementor-widget-wrap{min-width:0}
+.elementor-background-overlay{pointer-events:none}
+
+/* ELNASHARGROUP branding is controlled only by brand-layout.css/brand-fix.js. */
+img[data-elnashar-brand],
+.elnashar-brand-image,
+.header__logo-2 img,
+.offcanvas__logo img,
+.footer__logo img,
+.footer__logo-2 img{
+  object-fit:contain!important;
+}
+
+/* Prevent common overflow/cropping issues on tablets and phones. */
+@media(max-width:1199px){
+  .elementor-section .elementor-container,
+  .e-con-inner{max-width:100%}
+  .elementor-widget-wrap{min-width:0}
+}
+@media(max-width:767px){
+  body{width:100%;overflow-x:hidden}
+  figure{margin-left:0;margin-right:0;max-width:100%}
+  .elementor-widget-image img[data-nashar-media-managed="1"],
+  .elementor-image img[data-nashar-media-managed="1"]{max-width:100%!important;height:auto!important}
+  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{min-width:0!important}
+}
