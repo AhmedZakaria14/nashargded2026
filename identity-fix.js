@@ -1,11 +1,11 @@
-/* ELNASHARGROUP identity authority — removes visible legacy Adsela/Nashar branding without touching technical origin asset URLs. */
+/* النشار جروب identity authority — removes visible legacy Adsela/Nashar branding without touching technical origin asset URLs. */
 (function(){
   'use strict';
-  const BRAND='ELNASHARGROUP';
+  const BRAND='النشار جروب';
   const LOGO='/assets/elnashargroup-logo-v3.svg';
   const SITE=location.origin;
-  const HOME_TITLE='ELNASHARGROUP | وكالة تسويق رقمي في السعودية والخليج';
-  const DEFAULT_DESC='ELNASHARGROUP شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.';
+  const HOME_TITLE='النشار جروب | وكالة تسويق رقمي في السعودية والخليج';
+  const DEFAULT_DESC='النشار جروب شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.';
   const SKIP=new Set(['SCRIPT','STYLE','NOSCRIPT','CODE','PRE','TEXTAREA']);
 
   function brandText(value){
@@ -17,6 +17,7 @@
       .replace(/أدسيلا|ادسيلا/g,BRAND)
       .replace(/نشار\s+ديجيتال/g,BRAND)
       .replace(/Nashar\s+Digital/gi,BRAND)
+      .replace(/\bELNASHARGROUP\b/gi,BRAND)
       .replace(/(?:www\.)?adselams\.com/gi,BRAND)
       .replace(/(?:www\.)?nashar\.digital/gi,BRAND);
   }
@@ -63,7 +64,7 @@
   function patchMeta(){
     let title=brandText(document.title||'').trim();
     if(!title)title=HOME_TITLE;
-    if(!/ELNASHARGROUP/i.test(title))title=title+' | '+BRAND;
+    if(!title.includes(BRAND))title=title+' | '+BRAND;
     document.title=title;
 
     let desc=document.querySelector('meta[name="description"]')?.getAttribute('content')||DEFAULT_DESC;
@@ -124,7 +125,7 @@
       '@context':'https://schema.org',
       '@graph':[
         {'@type':'Organization','@id':SITE+'/#organization',name:BRAND,url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+LOGO,contentUrl:SITE+LOGO,caption:BRAND}},
-        {'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:BRAND,alternateName:BRAND,publisher:{'@id':SITE+'/#organization'},inLanguage:'ar'},
+        {'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:BRAND,alternateName:'ELNASHARGROUP',publisher:{'@id':SITE+'/#organization'},inLanguage:'ar'},
         {'@type':'WebPage','@id':SITE+location.pathname+'#webpage',url:SITE+location.pathname,name:document.title,isPartOf:{'@id':SITE+'/#website'},about:{'@id':SITE+'/#organization'},inLanguage:'ar'}
       ]
     };
