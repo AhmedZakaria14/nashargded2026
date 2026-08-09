@@ -26,7 +26,7 @@
     };
     const setProxy=v=>!v?v:v.split(',').map(part=>{const bits=part.trim().split(/\s+/);if(bits[0])bits[0]=proxy(bits[0]);return bits.join(' ')}).join(', ');
 
-    const r=await fetch('/exact-source/?media=stable-v5',{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    const r=await fetch('/exact-source/?media=stable-v6',{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
     if(!r.ok)throw new Error('source '+r.status);
     let h=await r.text();
 
@@ -66,14 +66,14 @@
       '<link rel="stylesheet" href="/origin/wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver%3Dd6958.css">'+
       '<link rel="stylesheet" href="/assets-fix.css?v=14">'+
       '<link rel="stylesheet" href="/services-menu-fix.css?v=2">'+
-      '<link rel="stylesheet" href="/media-layout-fix.css?v=2">'+
+      '<link rel="stylesheet" href="/media-layout-fix.css?v=3">'+
       '<link rel="stylesheet" href="/brand-layout.css?v=3">'+
       '</head>');
     out=out.replace('</body>',
       '<script src="/assets-fix.js?v=16">'+closeScript+
       '<script src="/services-menu-fix.js?v=2">'+closeScript+
       '<script src="/brand-fix.js?v=8">'+closeScript+
-      '<script src="/partners-carousel-fix.js?v=3">'+closeScript+
+      '<script src="/partners-owl-guard.js?v=1">'+closeScript+
       '</body>');
     document.open();document.write(out);document.close();
   }catch(e){
