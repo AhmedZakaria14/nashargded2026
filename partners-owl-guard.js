@@ -22,6 +22,7 @@
   };
   let tries=0;
   let observer=null;
+  let lastInstance=null;
 
   function getEl(){return document.getElementById(ID)}
   function jq(){return window.jQuery}
@@ -40,16 +41,22 @@
 
   function hardenLoaded($el,el){
     const instance=$el.data('owl.carousel');
+    const isNewInstance=!!instance&&instance!==lastInstance;
     if(instance){
       Object.assign(instance.options,CONFIG);
       Object.assign(instance.settings,CONFIG);
-      try{instance.invalidate('settings')}catch(e){}
+      if(isNewInstance){
+        lastInstance=instance;
+        try{instance.invalidate('settings')}catch(e){}
+      }
     }
     ensureImages(el);
     el.dataset.partnerCarousel='owl-original';
     el.style.removeProperty('transform');
     el.style.removeProperty('overflow');
-    try{$el.trigger('refresh.owl.carousel')}catch(e){}
+    if(isNewInstance){
+      try{$el.trigger('refresh.owl.carousel')}catch(e){}
+    }
     try{$el.trigger('play.owl.autoplay',[CONFIG.autoplayTimeout,CONFIG.autoplaySpeed])}catch(e){}
   }
 
@@ -89,7 +96,7 @@
         if(el.classList.contains('owl-loaded')) ensureOwl(false);
       });
     });
-    observer.observe(el,{attributes:true,attributeFilter:['class'],childList:true,subtree:false});
+    observer.observe(el,{attributes:true,attributeFilter:['class']});
   }
 
   function boot(){
