@@ -11,11 +11,14 @@
   function brandText(value){
     if(!value||typeof value!=='string') return value;
     return value
+      .replace(/[\w.+-]+@(?:adselams\.com|nashar\.digital)/gi,BRAND)
       .replace(/Adsela\s+Marketing\s+Solutions/gi,BRAND)
       .replace(/\bAdsela\b/gi,BRAND)
       .replace(/أدسيلا|ادسيلا/g,BRAND)
       .replace(/نشار\s+ديجيتال/g,BRAND)
-      .replace(/Nashar\s+Digital/gi,BRAND);
+      .replace(/Nashar\s+Digital/gi,BRAND)
+      .replace(/(?:www\.)?adselams\.com/gi,BRAND)
+      .replace(/(?:www\.)?nashar\.digital/gi,BRAND);
   }
 
   function patchText(root){
@@ -78,7 +81,7 @@
     ensureMeta('meta[name="twitter:image"]','name','twitter:image',SITE+LOGO);
 
     document.querySelectorAll('meta[name="twitter:site"],meta[name="twitter:creator"]').forEach(m=>{
-      if(/adsela|adselams/i.test(m.getAttribute('content')||''))m.remove();
+      if(/adsela|adselams|nashar\.digital/i.test(m.getAttribute('content')||''))m.remove();
     });
 
     let canonical=document.querySelector('link[rel="canonical"]');
@@ -96,6 +99,11 @@
   function patchLegacyLinks(){
     document.querySelectorAll('a[href]').forEach(a=>{
       const href=a.getAttribute('href')||'';
+      if(/^mailto:[^?]*@(adselams\.com|nashar\.digital)/i.test(href)){
+        a.setAttribute('href','/contact-us/');a.removeAttribute('target');a.setAttribute('aria-label','تواصل مع '+BRAND);
+        if(a.childElementCount===0)a.textContent='تواصل مع '+BRAND;
+        return;
+      }
       if(/^https?:\/\/adselams\.com\//i.test(href)){
         try{const u=new URL(href);a.setAttribute('href',u.pathname+u.search+u.hash)}catch(e){}
         return;
@@ -109,7 +117,7 @@
   function patchSchema(){
     document.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{
       const raw=s.textContent||'';
-      if(/Adsela|ادسيلا|أدسيلا|adselams\.com/i.test(raw))s.remove();
+      if(/Adsela|ادسيلا|أدسيلا|adselams\.com|nashar\.digital/i.test(raw))s.remove();
     });
     let s=document.querySelector('script[data-elnashar-schema]');
     const data={
