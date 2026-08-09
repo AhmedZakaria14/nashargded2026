@@ -9,6 +9,13 @@
 
   function root(){return document.getElementById(ID)}
 
+  function clearNativeStyles(el){
+    [...el.children].forEach(item=>{
+      item.style.removeProperty('transition');
+      item.style.removeProperty('transform');
+    });
+  }
+
   function initOwl(){
     const el=root();
     const $=window.jQuery;
@@ -16,10 +23,8 @@
     const $el=$(el);
     try{
       if($el.hasClass('owl-loaded')) $el.trigger('destroy.owl.carousel');
+      clearNativeStyles(el);
       $el.removeClass('partner-native-carousel');
-      $el.find('.partner-native-clone').remove();
-      el.style.removeProperty('transform');
-      el.style.removeProperty('transition');
       $el.owlCarousel({
         loop:true,
         center:false,
@@ -64,17 +69,22 @@
     const visible=()=>window.innerWidth>=980?4:2;
     const step=()=>{
       if(paused||busy||!el.isConnected) return;
-      const first=el.firstElementChild;
+      const children=[...el.children].filter(n=>n.nodeType===1);
+      const first=children[0];
       if(!first) return;
       const gap=10;
       const width=(el.clientWidth-gap*(visible()-1))/visible();
       busy=true;
-      el.style.transition='transform '+SPEED+'ms ease';
-      el.style.transform='translate3d(-'+(width+gap)+'px,0,0)';
+      children.forEach(item=>{
+        item.style.transition='transform '+SPEED+'ms ease';
+        item.style.transform='translate3d(-'+(width+gap)+'px,0,0)';
+      });
       window.setTimeout(()=>{
-        el.style.transition='none';
+        children.forEach(item=>{
+          item.style.transition='none';
+          item.style.transform='translate3d(0,0,0)';
+        });
         el.appendChild(first);
-        el.style.transform='translate3d(0,0,0)';
         void el.offsetWidth;
         busy=false;
       },SPEED+30);
