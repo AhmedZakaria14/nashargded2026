@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#07100c">
+  <link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">
+  <style>html,body{margin:0;background:#000;min-height:100%;color:#fff}#boot{position:fixed;inset:0;background:#000;z-index:2147483647}</style>
+</head>
+<body>
+<div id="boot" aria-hidden="true"></div>
+<script>
+(async()=>{
+  try{
+    const FULL='/assets/elnashargroup-logo-v3.svg';
+    const ICON='/assets/elnashargroup-icon-v3.svg';
+    const ORIGIN='https://adselams.com/';
+    const proxy=u=>{
+      if(!u||typeof u!=='string')return u;
+      const s=u.trim();
+      if(s.startsWith('https://adselams.com/'))return '/origin/'+s.slice(ORIGIN.length);
+      if(s.startsWith('http://adselams.com/'))return '/origin/'+s.slice('http://adselams.com/'.length);
+      if(s.startsWith('//adselams.com/'))return '/origin/'+s.slice('//adselams.com/'.length);
+      return s;
+    };
+    const setProxy=v=>!v?v:v.split(',').map(part=>{const bits=part.trim().split(/\s+/);if(bits[0])bits[0]=proxy(bits[0]);return bits.join(' ')}).join(', ');
+
+    const r=await fetch('/exact-source/?media=stable-v4',{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    if(!r.ok)throw new Error('source '+r.status);
+    let h=await r.text();
+
+    const fullRe=/(?:https?:\/\/adselams\.com\/)?(?:\.\/|\/)?wp-content\/uploads\/[^\"'()<>=\s]*(?:Adsela-Logo|adsela(?:[-_ ]?new)?[-_ ]?logo\d*|logo-png-white-01)[^\"'()<>=\s]*/gi;
+    const iconRe=/(?:https?:\/\/adselams\.com\/)?(?:\.\/|\/)?wp-content\/uploads\/[^\"'()<>=\s]*(?:adsela-icon-footer\d*|logo[-_ ]adsela[-_ ]half(?:[-_ ]right)?|cropped-fav-icon)[^\"'()<>=\s]*/gi;
+    h=h.replace(fullRe,FULL).replace(iconRe,ICON);
+
+    const d=new DOMParser().parseFromString(h,'text/html');
+    const mediaAttrs=['src','data-src','data-lazy-src','data-original','data-lazyload','poster','data-poster','data-bg','data-bg-hidpi','data-background-image','data-dce-background-image-url','data-dce-background-overlay-image-url'];
+    d.querySelectorAll('*').forEach(el=>{
+      mediaAttrs.forEach(a=>{const v=el.getAttribute(a);if(v)el.setAttribute(a,proxy(v))});
+      ['srcset','data-srcset','data-lazy-srcset'].forEach(a=>{const v=el.getAttribute(a);if(v)el.setAttribute(a,setProxy(v))});
+      const style=el.getAttribute('style');
+      if(style&&/https?:\/\/adselams\.com\//i.test(style))el.setAttribute('style',style.replace(/https?:\/\/adselams\.com\//gi,'/origin/'));
+    });
+    d.querySelectorAll('link[href]').forEach(link=>{
+      const rel=(link.getAttribute('rel')||'').toLowerCase();
+      if(/stylesheet|preload|icon/.test(rel))link.setAttribute('href',proxy(link.getAttribute('href')));
+    });
+
+    const cleanImg=(img,src)=>{
+      img.setAttribute('src',src);img.setAttribute('alt','ELNASHARGROUP');
+      ['srcset','data-src','data-lazy-src','data-original','data-srcset','data-lazy-srcset','data-sizes','loading','width','height'].forEach(a=>img.removeAttribute(a));
+      img.dataset.elnasharBrand=src===FULL?'logo':'icon';
+    };
+    d.querySelectorAll('.header__logo-2 img,.offcanvas__logo img,.footer__logo img,.footer__logo-2 img,.site-header .brand img,header img[alt="logo"],header img[alt="ELNASHARGROUP"],footer img[alt="logo"],footer img[alt="ELNASHARGROUP"]').forEach(img=>cleanImg(img,FULL));
+    d.querySelectorAll('.header__logo-2 source,.offcanvas__logo source,.footer__logo source,.footer__logo-2 source').forEach(s=>{s.setAttribute('srcset',FULL);s.removeAttribute('data-srcset');s.removeAttribute('data-lazy-srcset')});
+    d.querySelectorAll('.header__logo-2 a,.offcanvas__logo a,.footer__logo a,.footer__logo-2 a,.site-header .brand').forEach(a=>{a.setAttribute('title','ELNASHARGROUP');a.setAttribute('aria-label','ELNASHARGROUP')});
+    d.querySelectorAll('link[rel~="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"],link[rel="apple-touch-icon-precomposed"]').forEach(l=>{l.setAttribute('href',ICON);l.setAttribute('type','image/svg+xml')});
+    d.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute('content','#07100c'));
+
+    let out='<!DOCTYPE html>'+d.documentElement.outerHTML;
+    out=out.replace(fullRe,FULL).replace(iconRe,ICON);
+    out=out.replace('</head>',
+      '<link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">'+
+      '<link rel="stylesheet" href="/origin/wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver%3Dd6958.css">'+
+      '<link rel="stylesheet" href="/assets-fix.css?v=14">'+
+      '<link rel="stylesheet" href="/services-menu-fix.css?v=2">'+
+      '<link rel="stylesheet" href="/media-layout-fix.css?v=1">'+
+      '<link rel="stylesheet" href="/brand-layout.css?v=3">'+
+      '</head>');
+    out=out.replace('</body>',
+      '<script src="/assets-fix.js?v=15"><\\/script>'+
+      '<script src="/services-menu-fix.js?v=2"><\\/script>'+
+      '<script src="/brand-fix.js?v=8"><\\/script>'+
+      '</body>');
+    document.open();document.write(out);document.close();
+  }catch(e){
+    console.error(e);
+    const boot=document.getElementById('boot');
+    if(boot)boot.innerHTML='<div style="padding:30px;font-family:Arial">تعذر تحميل الصفحة. أعد المحاولة.</div>';
+  }
+})();
+</script>
+</body>
+</html>
