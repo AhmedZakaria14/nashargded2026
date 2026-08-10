@@ -1,4 +1,4 @@
-/* Exact-appearance compatibility layer for the saved homepage. Loaded after the original UCSS. */
+/* Compatibility layer for the cloned source. Keep this limited to missing fonts/icons/menu helpers; source CSS owns layout and motion. */
 @font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-solid-900.woff2') format('woff2')}
 @font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-regular-400.woff2') format('woff2')}
 @font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-brands-400.woff2') format('woff2')}
@@ -14,12 +14,12 @@
 .elementor-social-icon i{display:block!important;line-height:1!important}.elementor-social-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
 img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15s ease}img[src^="/origin/"],img[src^="https://adselams.com/"]{opacity:1!important;visibility:visible!important}
 
-/* Header logo: exact size used by the reference HTML (inline height:55px). */
+/* Header identity only; responsive geometry remains in brand-layout.css/source theme. */
 .header__logo-2{display:flex!important;align-items:center!important;min-width:0!important}
 .header__logo-2>a{display:flex!important;align-items:center!important;width:auto!important;max-width:100%!important}
 .header__logo-2 img[alt="logo"]{display:block!important;height:55px!important;width:auto!important;max-width:none!important;min-width:0!important;object-fit:contain!important;object-position:center!important;margin:0!important}
 
-/* Exact desktop Services dropdown from the reference site. */
+/* Desktop Services dropdown compatibility. */
 @media (min-width:1200px){
   .header__nav-2 .main-menu>li.dropdown{position:relative!important}
   .header__nav-2 .main-menu>li.dropdown>.main-dropdown{
@@ -37,37 +37,22 @@ img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15
     top:75px!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;
   }
   .header__nav-2 .main-menu>li.dropdown>.main-dropdown>li{display:block!important;width:100%!important;margin:0!important;padding:0!important;float:none!important;list-style:none!important}
-  .header__area-2 .header__nav-2 .main-dropdown li a,
-  .header__nav-2 .main-dropdown li a{
+  .header__area-2 .header__nav-2 .main-dropdown li a,.header__nav-2 .main-dropdown li a{
     display:block!important;width:100%!important;box-sizing:border-box!important;padding:10px 20px!important;margin:0!important;
     color:var(--black-2,#1d1d1d)!important;background:transparent!important;text-align:right!important;
     text-decoration:none!important;white-space:normal!important;line-height:1.45!important;letter-spacing:0!important;
     transition:letter-spacing .3s ease!important;
   }
-  .header__area-2 .header__nav-2 .main-dropdown li a:hover,
-  .header__nav-2 .main-dropdown li a:hover{letter-spacing:1px!important;background:transparent!important;color:var(--black-2,#1d1d1d)!important}
+  .header__area-2 .header__nav-2 .main-dropdown li a:hover,.header__nav-2 .main-dropdown li a:hover{letter-spacing:1px!important;background:transparent!important;color:var(--black-2,#1d1d1d)!important}
 }
 
-/* Exact reference proportions for “نفتخر أيضا بشراكاتنا مع”. */
-.elementor-37155 .elementor-element.elementor-element-c9303f0{margin-top:0!important;margin-bottom:0!important;padding:0!important;border-style:none!important;background:#000!important}
-.elementor-37155 .elementor-element.elementor-element-c9303f0>.elementor-container{min-height:160px!important;display:flex!important;align-items:center!important}
-.elementor-37155 .elementor-element.elementor-element-dde27c0.elementor-column>.elementor-widget-wrap,.elementor-37155 .elementor-element.elementor-element-8e5afd7.elementor-column>.elementor-widget-wrap{align-content:center!important;align-items:center!important}
-.elementor-37155 .elementor-element.elementor-element-32fac31 .sec-title{color:#fff!important;font-size:38px!important;line-height:1.25!important;margin:0!important}
-.elementor-37155 .elementor-element.elementor-element-c98c777 .uc_logo_carousel_holder{height:200px!important;border-radius:0!important;padding:20px!important;border-style:none!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important}
-#uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder a{height:100%!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important}
-#uc_logo_carousel_elementor_c98c777 img{height:100%!important;width:100%!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;display:block!important}
-
-/* Same initial presentation as Owl Carousel if its JS is still loading: 4 desktop, 2 tablet/mobile, 10px gap. */
-#uc_logo_carousel_elementor_c98c777:not(.owl-loaded){display:flex!important;align-items:center!important;overflow:hidden!important;gap:10px!important;direction:ltr!important;width:100%!important}
-#uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex:0 0 calc((100% - 30px)/4)!important;min-width:0!important;max-width:calc((100% - 30px)/4)!important}
-
-/* Form select caret: draw it with CSS instead of an icon-font glyph. */
+/* Form select caret without depending on a missing icon glyph. */
 .elementor-select-wrapper .select-caret-down-wrapper{inset-inline-end:10px!important;top:50%!important;transform:translateY(-50%)!important;pointer-events:none!important;display:flex!important;align-items:center!important;justify-content:center!important;width:20px!important;height:28px!important;color:inherit!important}
 .elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down{font-family:inherit!important;font-size:0!important;line-height:1!important;width:12px!important;height:12px!important;display:block!important;position:relative!important}
 .elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down:before{content:""!important;display:block!important;width:8px!important;height:8px!important;border-right:1.6px solid currentColor!important;border-bottom:1.6px solid currentColor!important;transform:rotate(45deg)!important;transform-origin:center!important;margin:0 auto 4px!important;box-sizing:border-box!important}
 .fa-chevron-down:before{content:""!important;display:inline-block!important;width:.48em!important;height:.48em!important;border-right:.12em solid currentColor!important;border-bottom:.12em solid currentColor!important;transform:rotate(45deg)!important;vertical-align:.18em!important}
 
-/* Mobile/off-canvas Services submenu fallback, matching the reference MeanMenu behavior. */
+/* Mobile/off-canvas Services submenu fallback only when the source MeanMenu did not initialize. */
 .offcanvas__menu .menu-item-40652{position:relative!important}
 .offcanvas__menu .menu-item-40652>.main-dropdown-menu{margin:0!important;padding:0!important;list-style:none!important}
 .offcanvas__menu .menu-item-40652>.main-dropdown-menu>li{margin:0!important;padding:0!important;list-style:none!important}
@@ -88,20 +73,6 @@ img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15
   .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.main-dropdown-menu a{font-size:.58em!important;padding-top:12px!important;padding-bottom:12px!important}
 }
 
-@media (min-width:768px){
-  .elementor-37155 .elementor-element.elementor-element-dde27c0{width:30%!important}
-  .elementor-37155 .elementor-element.elementor-element-8e5afd7{width:70%!important}
-  .elementor-37155 .elementor-element.elementor-element-8e5afd7>.elementor-element-populated{margin:0 30px 0 0!important;--e-column-margin-right:30px!important;--e-column-margin-left:0px!important}
-  .elementor-37155 .elementor-element.elementor-element-32fac31 .sec-title{text-align:right!important}
-}
-@media (min-width:768px) and (max-width:979px){
-  #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex-basis:calc((100% - 10px)/2)!important;max-width:calc((100% - 10px)/2)!important}
-}
 @media (max-width:767px){
   .header__logo-2 img[alt="logo"]{height:55px!important;width:auto!important;max-width:min(203px,65vw)!important}
-  .elementor-37155 .elementor-element.elementor-element-c9303f0>.elementor-container{display:flex!important;flex-direction:column!important;min-height:160px!important;align-items:stretch!important}
-  .elementor-37155 .elementor-element.elementor-element-dde27c0,.elementor-37155 .elementor-element.elementor-element-8e5afd7{width:100%!important}
-  .elementor-37155 .elementor-element.elementor-element-8e5afd7>.elementor-element-populated{margin:0!important;--e-column-margin-right:0px!important;--e-column-margin-left:0px!important}
-  .elementor-37155 .elementor-element.elementor-element-32fac31 .sec-title{text-align:center!important;font-size:38px!important;padding:18px 12px 0!important}
-  #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex-basis:calc((100% - 10px)/2)!important;max-width:calc((100% - 10px)/2)!important}
 }
