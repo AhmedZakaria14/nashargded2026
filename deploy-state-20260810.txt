@@ -1,0 +1,3 @@
+Stable production redeploy marker.
+Preserves Nashar Group branding and pre-placeholder media recovery state.
+Generated to force Vercel to deploy the restored main branch after rollback.
