@@ -10,23 +10,51 @@
   <meta name="description" content="النشار جروب شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.">
   <title>النشار جروب | وكالة تسويق رقمي في السعودية والخليج</title>
   <link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">
-  <style>html,body{margin:0;background:#000;min-height:100%;color:#fff}#boot{position:fixed;inset:0;background:#000;z-index:2147483647}</style>
-<link rel="stylesheet" href="/assets-fix.css?v=3"></head>
+  <link rel="stylesheet" href="/assets-fix.css?v=17">
+  <style>
+    html,body{margin:0;background:#000;min-height:100%;color:#fff}
+    #boot{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;z-index:-1!important}
+    #loader-fallback{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px;box-sizing:border-box;background:#000;color:#fff;font-family:Arial,sans-serif;text-align:center}
+    #loader-fallback img{width:min(320px,70vw);height:auto;margin-bottom:24px}
+    #loader-fallback a{display:inline-block;margin-top:18px;padding:12px 22px;border-radius:8px;background:#402977;color:#fff;text-decoration:none}
+  </style>
+</head>
 <body>
-<div id="boot" aria-hidden="true"></div>
+<div id="boot" aria-hidden="true" hidden></div>
 <script>
 (async()=>{
+  const BRAND='النشار جروب';
+  const ALT_BRAND='ELNASHARGROUP';
+  const FULL='/assets/elnashargroup-logo-v3.svg';
+  const ICON='/assets/elnashargroup-icon-v3.svg';
+  const ORIGIN='https://adselams.com/';
+  const SITE=location.origin;
+  const PATH=location.pathname||'/';
+  const IS_HOME=PATH==='/'||PATH==='/home-v4.html'||PATH==='/index.html';
+  const HOME_TITLE='النشار جروب | وكالة تسويق رقمي في السعودية والخليج';
+  const DEFAULT_DESC='النشار جروب شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.';
+
+  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function fetchTextWithRetry(url){
+    let lastError=null;
+    for(let attempt=0;attempt<2;attempt++){
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),7000);
+      try{
+        const r=await fetch(url,{cache:'no-store',headers:{'Cache-Control':'no-cache'},signal:controller.signal});
+        if(!r.ok)throw new Error('source '+r.status+' '+url);
+        return await r.text();
+      }catch(e){
+        lastError=e;
+        if(attempt===0)await sleep(250);
+      }finally{
+        clearTimeout(timer);
+      }
+    }
+    throw lastError||new Error('Unable to load '+url);
+  }
+
   try{
-    const BRAND='النشار جروب';
-    const ALT_BRAND='ELNASHARGROUP';
-    const FULL='/assets/elnashargroup-logo-v3.svg';
-    const ICON='/assets/elnashargroup-icon-v3.svg';
-    const ORIGIN='https://adselams.com/';
-    const SITE=location.origin;
-    const PATH=location.pathname||'/';
-    const IS_HOME=PATH==='/'||PATH==='/home-v4.html'||PATH==='/index.html';
-    const HOME_TITLE='النشار جروب | وكالة تسويق رقمي في السعودية والخليج';
-    const DEFAULT_DESC='النشار جروب شريك نمو رقمي متكامل يقدم خدمات التسويق الرقمي، الإعلانات، تحسين محركات البحث، تصميم وتطوير المواقع، التجارة الإلكترونية والهوية الإبداعية في السعودية والخليج.';
     const brandText=v=>!v?v:v.replace(/[\w.+-]+@(?:adselams\.com|nashar\.digital)/gi,BRAND).replace(/Adsela\s+Marketing\s+Solutions/gi,BRAND).replace(/\bAdsela\b/gi,BRAND).replace(/أدسيلا|ادسيلا/g,BRAND).replace(/نشار\s+ديجيتال/g,BRAND).replace(/Nashar\s+Digital/gi,BRAND).replace(/\bELNASHARGROUP\b/gi,BRAND).replace(/(?:www\.)?adselams\.com/gi,BRAND).replace(/(?:www\.)?nashar\.digital/gi,BRAND);
     const proxy=u=>{
       if(!u||typeof u!=='string')return u;
@@ -38,11 +66,8 @@
     };
     const setProxy=v=>!v?v:v.split(',').map(part=>{const bits=part.trim().split(/\s+/);if(bits[0])bits[0]=proxy(bits[0]);return bits.join(' ')}).join(', ');
 
-    /* Homepage HTML is now an immutable local snapshot. Internal pages keep the cloned design and are branded before first paint. */
-    const sourceUrl=IS_HOME?'/source-snapshot.html?brand=nashar-static-v1':('/origin'+PATH+(location.search||''));
-    const r=await fetch(sourceUrl,{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
-    if(!r.ok)throw new Error('source '+r.status+' '+sourceUrl);
-    let h=await r.text();
+    const sourceUrl=IS_HOME?'/source-snapshot.html?brand=nashar-static-v2':('/origin'+PATH+(location.search||''));
+    let h=await fetchTextWithRetry(sourceUrl);
 
     const fullRe=/(?:https?:\/\/adselams\.com\/)?(?:\.\/|\/)?wp-content\/uploads\/[^\"'()<>=\s]*(?:Adsela-Logo|adsela(?:[-_ ]?new)?[-_ ]?logo\d*|logo-png-white-01)[^\"'()<>=\s]*/gi;
     const iconRe=/(?:https?:\/\/adselams\.com\/)?(?:\.\/|\/)?wp-content\/uploads\/[^\"'()<>=\s]*(?:adsela-icon-footer\d*|logo[-_ ]adsela[-_ ]half(?:[-_ ]right)?|cropped-fav-icon)[^\"'()<>=\s]*/gi;
@@ -110,29 +135,29 @@
     d.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{if(/Adsela|ادسيلا|أدسيلا|adselams\.com|nashar\.digital/i.test(s.textContent||''))s.remove()});
     const schema=d.createElement('script');schema.type='application/ld+json';schema.dataset.nasharSchema='1';schema.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':SITE+'/#organization',name:BRAND,alternateName:ALT_BRAND,url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+FULL,contentUrl:SITE+FULL,caption:BRAND}},{'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:BRAND,alternateName:ALT_BRAND,publisher:{'@id':SITE+'/#organization'},inLanguage:PATH.startsWith('/en')?'en':'ar'},{'@type':'WebPage','@id':SITE+(IS_HOME?'/':PATH)+'#webpage',url:SITE+(IS_HOME?'/':PATH),name:pageTitle,isPartOf:{'@id':SITE+'/#website'},about:{'@id':SITE+'/#organization'},inLanguage:PATH.startsWith('/en')?'en':'ar'}]});d.head.appendChild(schema);
 
+    const ensureStyle=href=>{if(!d.querySelector('link[href="'+href+'"]')){const l=d.createElement('link');l.rel='stylesheet';l.href=href;d.head.appendChild(l)}};
+    ensureStyle('/assets-fix.css?v=17');
+    ensureStyle('/services-menu-fix.css?v=2');
+    ensureStyle('/media-layout-fix.css?v=3');
+    ensureStyle('/brand-layout.css?v=3');
+    if(IS_HOME)ensureStyle('/origin/wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver%3Dd6958.css');
+
+    const scripts=[
+      ['/assets-fix.js?v=16',false],
+      ['/services-menu-fix.js?v=2',false],
+      ['/brand-stability.js?v=1',false],
+      ['/partners-owl-guard.js?v=2',false]
+    ];
+    scripts.forEach(([src,defer])=>{if(!d.querySelector('script[src="'+src+'"]')){const s=d.createElement('script');s.src=src;if(defer)s.defer=true;d.body.appendChild(s)}});
+
     let out='<!DOCTYPE html>'+d.documentElement.outerHTML;
-    const closeScript='</scr'+'ipt>';
     out=out.replace(fullRe,FULL).replace(iconRe,ICON);
-    const homeUcss=IS_HOME?'<link rel="stylesheet" href="/origin/wp-content/litespeed/ucss/efedc5e60b2c472609156afd9951205c_ver%3Dd6958.css">':'';
-    out=out.replace('</head>',
-      '<link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">'+
-      homeUcss+
-      ''+
-      '<link rel="stylesheet" href="/services-menu-fix.css?v=2">'+
-      '<link rel="stylesheet" href="/media-layout-fix.css?v=3">'+
-      '<link rel="stylesheet" href="/brand-layout.css?v=3">'+
-      '</head>');
-    out=out.replace('<script src="/assets-fix.js?v=3" defer></script></body>',
-      '<script src="/assets-fix.js?v=16">'+closeScript+
-      '<script src="/services-menu-fix.js?v=2">'+closeScript+
-      '<script src="/brand-stability.js?v=1">'+closeScript+
-      '<script src="/partners-owl-guard.js?v=2">'+closeScript+
-      '</body>');
-    document.open();document.write(out);document.close();
+    document.open();
+    document.write(out);
+    document.close();
   }catch(e){
-    console.error(e);
-    const boot=document.getElementById('boot');
-    if(boot)boot.innerHTML='<div style="padding:30px;font-family:Arial">تعذر تحميل الصفحة. أعد المحاولة.</div>';
+    console.error('Nashar loader failed:',e);
+    document.body.innerHTML='<main id="loader-fallback"><div><img src="/assets/elnashargroup-logo-v3.svg" alt="النشار جروب"><h1>النشار جروب</h1><p>تعذر تحميل محتوى الصفحة مؤقتًا. لن يتم عرض شاشة سوداء تحجب الموقع.</p><a href="'+location.pathname+'?retry='+Date.now()+'">إعادة المحاولة</a></div></main>';
   }
 })();
 </script>
