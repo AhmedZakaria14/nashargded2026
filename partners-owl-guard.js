@@ -1,16 +1,16 @@
-/* النشار جروب partner strip v6 — seed content only; original Unlimited Elements/Owl owns all motion. */
+/* النشار جروب partner strip v7 — seed content only; original Unlimited Elements/Owl owns all motion. */
 (function(){
   'use strict';
-  if(window.__nasharPartnersV6)return;
-  window.__nasharPartnersV6=true;
+  if(window.__nasharPartnersV7)return;
+  window.__nasharPartnersV7=true;
 
   const ID='uc_logo_carousel_elementor_c98c777';
   const PARTNERS=[
     {key:'meta',name:'Meta',src:'/assets/partners/meta.svg'},
     {key:'snapchat',name:'Snapchat',src:'/assets/partners/snapchat.svg'},
+    {key:'google',name:'Google',src:'/assets/partners/google.svg'},
     {key:'tiktok',name:'TikTok',src:'/assets/partners/tiktok.svg'},
-    {key:'salla',name:'Salla',src:'/assets/partners/salla.svg'},
-    {key:'google',name:'Google',src:'/assets/partners/google.svg'}
+    {key:'salla',name:'Salla',src:'/assets/partners/salla.svg'}
   ];
 
   function fallbackSvg(name){
@@ -31,9 +31,9 @@
   }
 
   function addStaticOverrides(){
-    if(document.getElementById('nashar-partners-static-v6'))return;
+    if(document.getElementById('nashar-partners-static-v7'))return;
     const style=document.createElement('style');
-    style.id='nashar-partners-static-v6';
+    style.id='nashar-partners-static-v7';
     style.textContent=`
       html #${ID},html #${ID} .owl-stage-outer,html #${ID} .owl-stage,html #${ID} .owl-item{visibility:visible!important;opacity:1!important}
       html #${ID} [data-nashar-partner] img{filter:none!important;visibility:visible!important;opacity:1!important}
@@ -69,7 +69,7 @@
     }
 
     root.innerHTML=markup();
-    root.dataset.nasharPartnerSet='nashar-partners-five-v6';
+    root.dataset.nasharPartnerSet='nashar-partners-five-v7';
     root.dataset.partnerCarousel='seeded-for-original-owl';
     root.classList.remove('owl-hidden','owl-loading');
     bindFallbacks(root);
