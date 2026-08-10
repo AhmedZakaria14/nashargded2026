@@ -31,7 +31,7 @@
   }
 
   /* Patch ONLY the source carousel initializer before LiteSpeed executes it.
-     Source: responsive:{0:{items:2},768:{items:2},980:{items:4}}.
+     Source: responsive:{0:{items:2,},768:{items:2,},980:{items:4,}}.
      Phone breakpoint alone becomes items:5 so all approved logos fit in one mobile viewport.
      Owl still owns widths, transforms, autoplay and lifecycle; desktop/tablet are untouched. */
   function patchLiteSpeedCarouselInitializer(){
@@ -42,7 +42,7 @@
     window.litespeed_load_one=function(node,done){
       try{
         if(node && node.textContent && node.textContent.indexOf(ID)!==-1 && node.textContent.indexOf('owlCarousel')!==-1){
-          const re=/(responsive\s*:\s*\{\s*0\s*:\s*\{\s*items\s*:\s*)2(\s*\})/;
+          const re=/(responsive\s*:\s*\{\s*0\s*:\s*\{\s*items\s*:\s*)2(\s*,?\s*\})/;
           node.textContent=node.textContent.replace(re,function(match,before,after){
             return before+'5'+after;
           });
