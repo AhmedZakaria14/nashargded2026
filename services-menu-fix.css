@@ -1,5 +1,7 @@
-/* Desktop Services dropdown repair only.
-   Mobile/off-canvas navigation deliberately inherits the cloned source theme unchanged. */
+/* Nashar menu runtime v5 styles.
+   Desktop repair is isolated to >=1200px.
+   Mobile rules activate ONLY if the original MeanMenu runtime fails and v5 converts the ORIGINAL nav in place
+   to the same .mean-container/.mean-nav structure used by the source theme. */
 
 @media (min-width:1200px){
   .header__area-2,
@@ -80,5 +82,152 @@
     color:#121212!important;
     background:transparent!important;
     letter-spacing:1px!important;
+  }
+}
+
+/* Only the dependency-free emergency path uses these rules.
+   The selectors intentionally mirror MeanMenu's generated DOM/classes and the source site's own overrides. */
+@media (max-width:1199px){
+  .offcanvas__menu-wrapper.nashar-mean-fallback{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:relative!important;
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    transform:none!important;
+    overflow:visible!important;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav>ul,
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav ul{
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    list-style:none!important;
+    background:transparent!important;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav ul li{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:relative!important;
+    float:none!important;
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    list-style:none!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+  }
+
+  /* Matches the source site's explicit MeanMenu override: 90% width, 20px padding, 36px main level. */
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav>ul>li>a:not(.mean-expand){
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    box-sizing:border-box!important;
+    width:90%!important;
+    min-height:1px!important;
+    margin:0!important;
+    padding:20px 20px!important;
+    color:#fff!important;
+    background:transparent!important;
+    font-weight:400!important;
+    font-size:36px!important;
+    line-height:1.25!important;
+    text-align:right!important;
+    text-decoration:none!important;
+    white-space:normal!important;
+    transform:none!important;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav a.mean-expand{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    align-items:center!important;
+    justify-content:center!important;
+    position:absolute!important;
+    top:0!important;
+    left:0!important;
+    right:auto!important;
+    z-index:5!important;
+    box-sizing:border-box!important;
+    width:10%!important;
+    min-width:44px!important;
+    height:70px!important;
+    margin:0!important;
+    padding:13px 0!important;
+    color:#fff!important;
+    background:transparent!important;
+    border:0!important;
+    font-size:30px!important;
+    line-height:1!important;
+    text-align:center!important;
+    text-decoration:none!important;
+    transform:none!important;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav ul ul{
+    display:none;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    overflow:hidden;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav ul ul li>a:not(.mean-expand){
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    box-sizing:border-box!important;
+    width:90%!important;
+    margin:0!important;
+    padding:12px 34px 12px 20px!important;
+    color:#fff!important;
+    background:transparent!important;
+    font-weight:400!important;
+    font-size:17px!important;
+    line-height:1.5!important;
+    text-align:right!important;
+    text-decoration:none!important;
+    white-space:normal!important;
+    transform:none!important;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav>ul>li+li{
+    border-top:1px solid rgba(255,255,255,.08)!important;
+  }
+
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav ul ul li+li{
+    border-top:1px solid rgba(255,255,255,.045)!important;
+  }
+}
+
+@media (max-width:767px){
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav>ul>li>a:not(.mean-expand){
+    font-size:36px!important;
+    padding:18px 20px!important;
+  }
+  .offcanvas__menu-wrapper.nashar-mean-fallback .mean-nav a.mean-expand{
+    height:68px!important;
+    padding:13px 0!important;
   }
 }
