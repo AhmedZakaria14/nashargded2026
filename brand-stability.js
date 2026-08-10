@@ -50,7 +50,7 @@
     const icon=!slot&&/(icon-footer|cropped-fav|logo-adsela-half|elnashargroup-icon)/i.test(raw);
     const target=icon?ICON:LOGO;
     if(img.getAttribute('src')!==target)img.setAttribute('src',target);
-    img.setAttribute('alt',BRAND);
+    if(img.getAttribute('alt')!==BRAND)img.setAttribute('alt',BRAND);
     ['srcset','data-src','data-srcset','data-lazy-src','data-lazy-srcset','data-original','data-sizes'].forEach(a=>img.removeAttribute(a));
     img.style.setProperty('visibility','visible','important');
     img.style.setProperty('opacity','1','important');
@@ -72,15 +72,19 @@
     if(!isLanguageAnchor(el))return false;
     const target=IS_EN?'/':'/en/';
     const label=IS_EN?'العربية':'English';
-    el.setAttribute('href',target);
-    el.removeAttribute('target');
-    el.setAttribute('hreflang',IS_EN?'ar':'en');
-    el.setAttribute('lang',IS_EN?'ar':'en');
-    el.setAttribute('aria-label',IS_EN?'التبديل إلى العربية':'Switch to English');
+    const lang=IS_EN?'ar':'en';
+    const aria=IS_EN?'التبديل إلى العربية':'Switch to English';
+    if(el.getAttribute('href')!==target)el.setAttribute('href',target);
+    if(el.hasAttribute('target'))el.removeAttribute('target');
+    if(el.getAttribute('hreflang')!==lang)el.setAttribute('hreflang',lang);
+    if(el.getAttribute('lang')!==lang)el.setAttribute('lang',lang);
+    if(el.getAttribute('aria-label')!==aria)el.setAttribute('aria-label',aria);
     const native=el.querySelector('.wpml-ls-native');
-    if(native){native.textContent=label;native.setAttribute('lang',IS_EN?'ar':'en')}
-    else if(el.childElementCount===0)el.textContent=label;
-    el.dataset.nasharLanguageSwitch='1';
+    if(native){
+      if(native.textContent!==label)native.textContent=label;
+      if(native.getAttribute('lang')!==lang)native.setAttribute('lang',lang);
+    }else if(el.childElementCount===0&&el.textContent!==label)el.textContent=label;
+    if(el.dataset.nasharLanguageSwitch!=='1')el.dataset.nasharLanguageSwitch='1';
     return true;
   }
 
@@ -121,7 +125,7 @@
   function upsertAlternate(lang,href){
     let l=document.querySelector('link[rel="alternate"][hreflang="'+lang+'"]');
     if(!l){l=document.createElement('link');l.rel='alternate';l.setAttribute('hreflang',lang);document.head.appendChild(l)}
-    l.href=href;
+    if(l.href!==href)l.href=href;
   }
 
   function patchHead(){
