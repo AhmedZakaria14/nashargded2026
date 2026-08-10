@@ -56,26 +56,8 @@ img[src^="data:image/svg+xml"],img[src^="data:image/gif"]{transition:opacity .15
 .elementor-select-wrapper .select-caret-down-wrapper .eicon-caret-down:before{content:""!important;display:block!important;width:8px!important;height:8px!important;border-right:1.6px solid currentColor!important;border-bottom:1.6px solid currentColor!important;transform:rotate(45deg)!important;transform-origin:center!important;margin:0 auto 4px!important;box-sizing:border-box!important}
 .fa-chevron-down:before{content:""!important;display:inline-block!important;width:.48em!important;height:.48em!important;border-right:.12em solid currentColor!important;border-bottom:.12em solid currentColor!important;transform:rotate(45deg)!important;vertical-align:.18em!important}
 
-/* Mobile/off-canvas Services submenu fallback only when the source MeanMenu did not initialize. */
-.offcanvas__menu .menu-item-40652{position:relative!important}
-.offcanvas__menu .menu-item-40652>.main-dropdown-menu{margin:0!important;padding:0!important;list-style:none!important}
-.offcanvas__menu .menu-item-40652>.main-dropdown-menu>li{margin:0!important;padding:0!important;list-style:none!important}
-.nashar-services-toggle{display:none}
-@media (max-width:1199px){
-  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.main-dropdown-menu{display:none!important}
-  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652.services-mobile-open>.main-dropdown-menu{display:block!important}
-  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.nashar-services-toggle{
-    display:flex!important;position:absolute!important;left:0!important;right:auto!important;top:0!important;
-    width:52px!important;height:62px!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;
-    color:inherit!important;align-items:center!important;justify-content:center!important;z-index:3!important;cursor:pointer!important;
-  }
-  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.nashar-services-toggle:before{
-    content:""!important;width:9px!important;height:9px!important;border-right:1.5px solid currentColor!important;border-bottom:1.5px solid currentColor!important;
-    transform:rotate(45deg)!important;transition:transform .25s ease!important;box-sizing:border-box!important;
-  }
-  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652.services-mobile-open>.nashar-services-toggle:before{transform:rotate(225deg)!important}
-  .offcanvas__menu-wrapper:not(.mean-container) .menu-item-40652>.main-dropdown-menu a{font-size:.58em!important;padding-top:12px!important;padding-bottom:12px!important}
-}
+/* Mobile/off-canvas navigation is intentionally not overridden here.
+   The cloned Axtra/Adsela source HTML, CSS and theme runtime own that experience exactly. */
 
 @media (max-width:767px){
   .header__logo-2 img[alt="logo"]{height:55px!important;width:auto!important;max-width:min(203px,65vw)!important}
