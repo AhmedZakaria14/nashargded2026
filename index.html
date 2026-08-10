@@ -11,7 +11,7 @@
   <title>النشار جروب | وكالة تسويق رقمي في السعودية والخليج</title>
   <link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">
   <style>html,body{margin:0;background:#000;min-height:100%;color:#fff}#boot{position:fixed;inset:0;background:#000;z-index:2147483647}</style>
-</head>
+<link rel="stylesheet" href="/assets-fix.css?v=3"></head>
 <body>
 <div id="boot" aria-hidden="true"></div>
 <script>
@@ -117,12 +117,12 @@
     out=out.replace('</head>',
       '<link rel="icon" type="image/svg+xml" href="/assets/elnashargroup-icon-v3.svg">'+
       homeUcss+
-      '<link rel="stylesheet" href="/assets-fix.css?v=14">'+
+      ''+
       '<link rel="stylesheet" href="/services-menu-fix.css?v=2">'+
       '<link rel="stylesheet" href="/media-layout-fix.css?v=3">'+
       '<link rel="stylesheet" href="/brand-layout.css?v=3">'+
       '</head>');
-    out=out.replace('</body>',
+    out=out.replace('<script src="/assets-fix.js?v=3" defer></script></body>',
       '<script src="/assets-fix.js?v=16">'+closeScript+
       '<script src="/services-menu-fix.js?v=2">'+closeScript+
       '<script src="/brand-stability.js?v=1">'+closeScript+
