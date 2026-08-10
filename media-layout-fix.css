@@ -1,6 +1,6 @@
-/* Responsive compatibility v6 — preserve the cloned layout/motion and make partner strip impossible to collapse. */
+/* Responsive compatibility v7 — preserve cloned Owl motion while making partner logos fully visible on mobile. */
 
-/* Do not create custom scroll containers: Elementor/theme keeps ownership of vertical scrolling and sticky/motion effects. */
+/* Do not create custom page scroll containers: Elementor/theme keeps ownership of vertical scrolling and sticky/motion effects. */
 html,body{max-width:100%}
 @supports (overflow:clip){html,body{overflow-x:clip}}
 @supports not (overflow:clip){html,body{overflow-x:hidden}}
@@ -19,8 +19,8 @@ img[data-nashar-media-managed="1"]{object-position:center}
 .elementor-background-video-container{overflow:hidden!important}
 .elementor-background-video-hosted{max-width:none!important;object-fit:cover!important;object-position:center center!important}
 
-/* Partner strip — Owl remains the only motion/drag engine.
-   The rules below only guarantee visibility and stable intrinsic height; they never override Owl stage transforms or item widths. */
+/* Partner strip — Owl remains the only animation/drag owner after .owl-loaded.
+   These rules only provide visibility, intrinsic sizing and a dependency-free pre-init mobile fallback. */
 #uc_logo_carousel_elementor_c98c777{
   width:100%!important;
   max-width:100%!important;
@@ -74,26 +74,28 @@ img[data-nashar-media-managed="1"]{object-position:center}
   align-items:center!important;
   justify-content:center!important;
 }
+
+/* Natural image ratio is critical on narrow items. Never force width+height percentages together. */
 #uc_logo_carousel_elementor_c98c777 img{
   display:block!important;
   visibility:visible!important;
   opacity:1!important;
-  width:78%!important;
-  height:64%!important;
+  width:auto!important;
+  height:auto!important;
   max-width:78%!important;
-  max-height:64%!important;
+  max-height:64px!important;
   object-fit:contain!important;
-  object-position:center!important;
+  object-position:center center!important;
+  filter:none!important;
   user-select:none!important;
   -webkit-user-drag:none!important;
   pointer-events:none!important;
 }
-/* The approved local partner SVGs are monochrome black sources; normalize them to crisp white on this black section only. */
-#uc_logo_carousel_elementor_c98c777 [data-nashar-partner] img{filter:brightness(0) invert(1)!important}
+#uc_logo_carousel_elementor_c98c777 [data-nashar-partner] img{filter:none!important}
 #uc_logo_carousel_elementor_c98c777 .owl-nav,
 #uc_logo_carousel_elementor_c98c777 .owl-dots{display:none!important}
 
-/* Always-visible pre-init/failure state. Owl replaces this layout as soon as .owl-loaded is applied. */
+/* Pre-init/failure state. Desktop preserves four-per-view like the source widget. */
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded){
   display:flex!important;
   align-items:center!important;
@@ -116,27 +118,54 @@ img[data-nashar-media-managed="1"]{object-position:center}
 img[data-elnashar-brand],.elnashar-brand-image,.header__logo-2 img,.offcanvas__logo img,.footer__logo img,.footer__logo-2 img{object-fit:contain!important}
 
 @media(max-width:979px){
+  /* If delayed Owl has not initialized yet, retain the original two-per-view geometry but allow horizontal touch access
+     to all five logos instead of permanently clipping logo 3+ behind overflow:hidden. */
+  #uc_logo_carousel_elementor_c98c777:not(.owl-loaded){
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scroll-snap-type:x proximity!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior-inline:contain!important;
+    touch-action:pan-x!important;
+    scrollbar-width:none!important;
+  }
+  #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)::-webkit-scrollbar{display:none!important}
   #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{
     flex:0 0 calc((100% - 10px)/2)!important;
     width:calc((100% - 10px)/2)!important;
     max-width:calc((100% - 10px)/2)!important;
+    scroll-snap-align:start!important;
   }
 }
 
 @media(max-width:767px){
-  /* Two partner logos per view, exactly matching the original widget breakpoint. */
+  /* Two partner logos per Owl view, exactly matching the original widget breakpoint. */
   body{min-width:0}
   figure{max-width:100%}
   .elementor-widget-image img[data-nashar-media-managed="1"],.elementor-image img[data-nashar-media-managed="1"]{max-width:100%!important;height:auto!important}
-  #uc_logo_carousel_elementor_c98c777{min-height:94px!important}
-  #uc_logo_carousel_elementor_c98c777 .owl-stage-outer{touch-action:pan-y!important;min-height:94px!important}
-  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{min-height:88px!important;padding:7px 9px!important}
-  #uc_logo_carousel_elementor_c98c777 img{width:76%!important;height:60%!important;max-width:76%!important;max-height:60%!important}
+  #uc_logo_carousel_elementor_c98c777{min-height:96px!important}
+  #uc_logo_carousel_elementor_c98c777 .owl-stage-outer{touch-action:pan-y!important;min-height:96px!important}
+  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{
+    min-height:90px!important;
+    aspect-ratio:auto!important;
+    padding:10px 12px!important;
+  }
+  #uc_logo_carousel_elementor_c98c777 img{
+    width:auto!important;
+    height:auto!important;
+    max-width:76%!important;
+    max-height:58px!important;
+  }
 }
 
 @media(max-width:390px){
-  #uc_logo_carousel_elementor_c98c777{min-height:88px!important}
-  #uc_logo_carousel_elementor_c98c777 .owl-stage-outer{min-height:88px!important}
-  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{min-height:82px!important;padding:6px 8px!important}
-  #uc_logo_carousel_elementor_c98c777 img{width:74%!important;height:58%!important;max-width:74%!important;max-height:58%!important}
+  #uc_logo_carousel_elementor_c98c777{min-height:92px!important}
+  #uc_logo_carousel_elementor_c98c777 .owl-stage-outer{min-height:92px!important}
+  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{min-height:86px!important;padding:9px 10px!important}
+  #uc_logo_carousel_elementor_c98c777 img{
+    width:auto!important;
+    height:auto!important;
+    max-width:72%!important;
+    max-height:54px!important;
+  }
 }
