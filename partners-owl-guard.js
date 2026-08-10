@@ -1,8 +1,11 @@
-/* النشار جروب partner strip — keep the existing Owl Carousel movement, but use only five stable local logos. */
+/* النشار جروب partner strip v3 — seed the new five-logo content, then let the original Owl Carousel own motion/drag exactly once. */
 (function(){
   'use strict';
+  if(window.__nasharPartnersV3)return;
+  window.__nasharPartnersV3=true;
+
   const ID='uc_logo_carousel_elementor_c98c777';
-  const SET_VERSION='nashar-partners-five-v1';
+  const SET_VERSION='nashar-partners-five-v3';
   const PARTNERS=[
     {key:'meta',name:'Meta',src:'/assets/partners/meta.svg'},
     {key:'snapchat',name:'Snapchat',src:'/assets/partners/snapchat.svg'},
@@ -10,17 +13,16 @@
     {key:'salla',name:'Salla',src:'/assets/partners/salla.svg'},
     {key:'google',name:'Google',src:'/assets/partners/google.svg'}
   ];
-  const CONFIG={
+  const FALLBACK={
     loop:true,
     center:false,
     autoplay:true,
     autoplayTimeout:3000,
-    autoplayHoverPause:true,
+    autoplayHoverPause:false,
     autoplaySpeed:1000,
     smartSpeed:1000,
     nav:false,
     dots:false,
-    navigation:true,
     margin:10,
     mouseDrag:true,
     touchDrag:true,
@@ -28,10 +30,10 @@
     freeDrag:false,
     responsive:{0:{items:2},768:{items:2},980:{items:4}}
   };
-  let tries=0;
-  let observer=null;
-  let lastInstance=null;
-  let syncing=false;
+
+  let seeded=false;
+  let fallbackStarted=false;
+  let pollCount=0;
 
   function getEl(){return document.getElementById(ID)}
   function jq(){return window.jQuery}
@@ -46,166 +48,116 @@
     ).join('');
   }
 
-  function currentKeys(el){
-    let nodes=[];
-    if(el.classList.contains('owl-loaded')){
-      nodes=[...el.querySelectorAll('.owl-item:not(.cloned) > .uc_logo_carousel[data-nashar-partner]')];
-    }else{
-      nodes=[...el.children].filter(n=>n.nodeType===1&&n.matches('.uc_logo_carousel[data-nashar-partner]'));
-    }
-    return nodes.map(n=>n.getAttribute('data-nashar-partner'));
-  }
-
-  function partnerSetIsCorrect(el){
-    const keys=currentKeys(el);
-    return el.dataset.nasharPartnerSet===SET_VERSION &&
-      keys.length===PARTNERS.length &&
-      PARTNERS.every((p,i)=>keys[i]===p.key);
-  }
-
-  function ensureImages(el){
-    el.querySelectorAll('[data-nashar-partner] img').forEach(img=>{
+  function ensureImages(root){
+    if(!root)return;
+    root.querySelectorAll('[data-nashar-partner] img').forEach(img=>{
       const item=img.closest('[data-nashar-partner]');
       const p=PARTNERS.find(x=>x.key===item?.getAttribute('data-nashar-partner'));
-      if(p&&img.getAttribute('src')!==p.src) img.setAttribute('src',p.src);
-      if(p){img.setAttribute('alt',p.name);img.setAttribute('title',p.name)}
-      ['srcset','data-src','data-lazy-src','data-original','data-srcset','data-lazy-srcset'].forEach(a=>img.removeAttribute(a));
-      img.style.setProperty('visibility','visible','important');
-      img.style.setProperty('opacity','1','important');
-      img.style.setProperty('display','block','important');
-      img.style.setProperty('object-fit','contain','important');
-      img.style.setProperty('object-position','center','important');
+      if(!p)return;
+      if(img.getAttribute('src')!==p.src)img.setAttribute('src',p.src);
+      img.setAttribute('alt',p.name);
+      img.setAttribute('title',p.name);
+      img.setAttribute('draggable','false');
+      ['srcset','data-src','data-lazy-src','data-original','data-srcset','data-lazy-srcset','data-sizes'].forEach(a=>img.removeAttribute(a));
+      img.style.removeProperty('visibility');
+      img.style.removeProperty('opacity');
+      img.style.removeProperty('width');
+      img.style.removeProperty('height');
     });
   }
 
-  function installPartnerSet(el,$){
-    if(partnerSetIsCorrect(el)){
-      ensureImages(el);
-      return false;
-    }
-    syncing=true;
-    try{
-      const $el=$?$(el):null;
-      if($el&&el.classList.contains('owl-loaded')&&$el.data('owl.carousel')){
-        try{$el.trigger('stop.owl.autoplay')}catch(e){}
-        try{$el.trigger('destroy.owl.carousel')}catch(e){}
+  function seed(){
+    const el=getEl();
+    if(!el)return false;
+
+    /* The guard normally runs before LiteSpeed executes the original Owl initializer.
+       Replace content only in that raw state; never fight Owl while it is building clones/stage. */
+    if(!el.classList.contains('owl-loaded')){
+      const direct=[...el.children].filter(n=>n.nodeType===1&&n.classList.contains('uc_logo_carousel'));
+      const keys=direct.map(n=>n.getAttribute('data-nashar-partner'));
+      const correct=el.dataset.nasharPartnerSet===SET_VERSION&&keys.length===PARTNERS.length&&PARTNERS.every((p,i)=>keys[i]===p.key);
+      if(!correct){
+        el.innerHTML=markup();
+        el.dataset.nasharPartnerSet=SET_VERSION;
       }
-      lastInstance=null;
-      el.classList.remove('owl-loaded','owl-drag','owl-hidden','owl-refresh');
-      el.innerHTML=markup();
-      el.dataset.nasharPartnerSet=SET_VERSION;
       el.dataset.partnerCarousel='owl-original';
       ensureImages(el);
+      seeded=true;
       return true;
-    }finally{
-      syncing=false;
     }
-  }
 
-  function hardenLoaded($el,el){
-    const instance=$el.data('owl.carousel');
-    const isNewInstance=!!instance&&instance!==lastInstance;
-    if(instance){
-      Object.assign(instance.options,CONFIG);
-      Object.assign(instance.settings,CONFIG);
-      if(isNewInstance){
-        lastInstance=instance;
-        try{instance.invalidate('settings')}catch(e){}
-      }
-    }
+    /* If Owl somehow initialized first, do not destroy it. Only preserve any already-seeded local images. */
     ensureImages(el);
-    el.dataset.partnerCarousel='owl-original';
-    el.style.removeProperty('transform');
-    el.style.removeProperty('overflow');
-    if(isNewInstance){
-      try{$el.trigger('refresh.owl.carousel')}catch(e){}
-    }
-    try{$el.trigger('play.owl.autoplay',[CONFIG.autoplayTimeout,CONFIG.autoplaySpeed])}catch(e){}
+    return false;
   }
 
-  function ensureOwl(forceInit){
+  function wakeExisting(){
     const el=getEl(),$=jq();
-    if(!el||!$||!$.fn||typeof $.fn.owlCarousel!=='function') return false;
+    if(!el||!$||!$.fn||typeof $.fn.owlCarousel!=='function')return false;
     const $el=$(el);
-    if(el.classList.contains('owl-loaded')&&$el.data('owl.carousel')){
-      hardenLoaded($el,el);
-      return true;
-    }
-    if(!forceInit) return false;
+    const instance=$el.data('owl.carousel');
+    if(!instance||!el.classList.contains('owl-loaded'))return false;
+
+    /* Keep the original instance/settings. Only guarantee the capabilities that are visibly required. */
+    if(instance.options){instance.options.autoplay=true;instance.options.mouseDrag=true;instance.options.touchDrag=true;instance.options.pullDrag=true}
+    if(instance.settings){instance.settings.autoplay=true;instance.settings.mouseDrag=true;instance.settings.touchDrag=true;instance.settings.pullDrag=true}
+    el.classList.add('owl-drag');
+    el.dataset.partnerCarousel='owl-original-ready';
+    ensureImages(el);
+    try{$el.trigger('play.owl.autoplay',[instance.settings?.autoplayTimeout||3000,instance.settings?.autoplaySpeed||instance.settings?.smartSpeed||1000])}catch(e){}
+    return true;
+  }
+
+  function fallbackInit(){
+    if(fallbackStarted||wakeExisting())return;
+    const el=getEl(),$=jq();
+    if(!el||!$||!$.fn||typeof $.fn.owlCarousel!=='function')return;
+    fallbackStarted=true;
+    seed();
     try{
-      $el.off('.elnasharPartners');
-      $el.on('initialized.owl.carousel.elnasharPartners refreshed.owl.carousel.elnasharPartners',function(){
-        ensureImages(el);
-        try{$el.trigger('play.owl.autoplay',[CONFIG.autoplayTimeout,CONFIG.autoplaySpeed])}catch(e){}
-      });
-      $el.owlCarousel(CONFIG);
-      hardenLoaded($el,el);
-      return true;
+      const $el=$(el);
+      $el.owlCarousel(FALLBACK);
+      el.dataset.partnerCarousel='owl-fallback-ready';
+      ensureImages(el);
+      try{$el.trigger('play.owl.autoplay',[FALLBACK.autoplayTimeout,FALLBACK.autoplaySpeed])}catch(e){}
     }catch(e){
-      console.warn('Partner Owl guard:',e);
-      return false;
+      fallbackStarted=false;
+      console.warn('Partner Owl fallback:',e);
     }
   }
 
-  function sync(){
-    if(syncing) return;
-    const el=getEl();
-    if(!el) return;
-    const $=jq();
-    const changed=installPartnerSet(el,$);
-    if(changed&&$&&$.fn&&typeof $.fn.owlCarousel==='function'){
-      ensureOwl(true);
-      return;
-    }
-    if(el.classList.contains('owl-loaded')) ensureOwl(false);
+  function poll(){
+    seed();
+    if(wakeExisting())return;
+    pollCount++;
+    if(pollCount<30)setTimeout(poll,150);
   }
 
-  function watch(){
-    const el=getEl();
-    if(!el||observer) return;
-    let scheduled=false;
-    observer=new MutationObserver(()=>{
-      if(syncing||scheduled) return;
-      scheduled=true;
-      requestAnimationFrame(()=>{
-        scheduled=false;
-        sync();
-      });
-    });
-    observer.observe(el,{attributes:true,attributeFilter:['class'],childList:true});
+  function start(){
+    seed();
+    poll();
   }
 
-  function boot(){
-    const el=getEl();
-    if(!el){
-      if(++tries<50) setTimeout(boot,200);
-      return;
-    }
-    const $=jq();
-    const changed=installPartnerSet(el,$);
-    watch();
+  /* Wait until all original LiteSpeed listeners for this event have run before using the fallback. */
+  document.addEventListener('DOMContentLiteSpeedLoaded',()=>{
+    setTimeout(()=>{
+      seed();
+      if(!wakeExisting())fallbackInit();
+    },300);
+  },{once:true});
 
-    /* If Owl is already available, initialise/reinitialise immediately with the clean five-logo set. */
-    if(changed&&$&&$.fn&&typeof $.fn.owlCarousel==='function'){
-      ensureOwl(true);
-      return;
-    }
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{
+      seed();
+      if(!wakeExisting())fallbackInit();
+    },900);
+  },{once:true});
 
-    /* Otherwise let the original delayed Unlimited Elements initialiser use our five items. */
-    if(ensureOwl(false)) return;
-    if(++tries<25){setTimeout(boot,200);return;}
-
-    /* Fallback still uses Owl only; no second carousel engine is introduced. */
-    if(!ensureOwl(true)&&tries<50) setTimeout(boot,250);
-  }
-
-  document.addEventListener('DOMContentLiteSpeedLoaded',()=>{tries=0;setTimeout(boot,0)});
-  window.addEventListener('load',()=>{tries=0;setTimeout(boot,50)},{once:true});
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();
 
-/* Load the isolated hero-video controller without changing the carousel or page structure. */
+/* Keep the approved replacement hero video isolated from the carousel runtime. */
 (function(){
   if(window.__elnasharHeroVideoLoader)return;
   window.__elnasharHeroVideoLoader=true;
