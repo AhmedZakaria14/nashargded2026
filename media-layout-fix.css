@@ -88,6 +88,8 @@ img[data-nashar-media-managed="1"]{object-position:center}
   -webkit-user-drag:none!important;
   pointer-events:none!important;
 }
+/* The approved local partner SVGs are monochrome black sources; normalize them to crisp white on this black section only. */
+#uc_logo_carousel_elementor_c98c777 [data-nashar-partner] img{filter:brightness(0) invert(1)!important}
 #uc_logo_carousel_elementor_c98c777 .owl-nav,
 #uc_logo_carousel_elementor_c98c777 .owl-dots{display:none!important}
 
