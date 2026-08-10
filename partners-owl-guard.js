@@ -31,9 +31,9 @@
   }
 
   /* Patch ONLY the source carousel initializer before LiteSpeed executes it.
-     The source uses responsive:{0:{items:2},768:{items:2},980:{items:4}}.
-     On phones we need every approved partner visible at once, so only the 0 breakpoint becomes items:5.
-     Owl still owns widths, transforms, autoplay and lifecycle; desktop/tablet settings are untouched. */
+     Source: responsive:{0:{items:2},768:{items:2},980:{items:4}}.
+     Phone breakpoint alone becomes items:5 so all approved logos fit in one mobile viewport.
+     Owl still owns widths, transforms, autoplay and lifecycle; desktop/tablet are untouched. */
   function patchLiteSpeedCarouselInitializer(){
     if(window.__nasharPartnersLiteSpeedPatched)return;
     const original=window.litespeed_load_one;
@@ -42,10 +42,10 @@
     window.litespeed_load_one=function(node,done){
       try{
         if(node && node.textContent && node.textContent.indexOf(ID)!==-1 && node.textContent.indexOf('owlCarousel')!==-1){
-          node.textContent=node.textContent.replace(
-            /(responsive\s*:\s*\{\s*0\s*:\s*\{\s*items\s*:\s*)2(\s*\})/,
-            '$15$2'
-          );
+          const re=/(responsive\s*:\s*\{\s*0\s*:\s*\{\s*items\s*:\s*)2(\s*\})/;
+          node.textContent=node.textContent.replace(re,function(match,before,after){
+            return before+'5'+after;
+          });
         }
       }catch(e){
         console.warn('Partner mobile responsive patch skipped:',e);
@@ -86,7 +86,7 @@
     const root=document.getElementById(ID);
     if(!root)return false;
 
-    /* Critical rule: once Owl has initialized, never touch its DOM, classes, widths, transforms or events. */
+    /* Once Owl has initialized, never touch its DOM, classes, widths, transforms or events. */
     if(root.classList.contains('owl-loaded') || (window.jQuery && window.jQuery(root).data('owl.carousel'))){
       bindFallbacks(root);
       root.dataset.partnerCarousel='original-owl-owner';
@@ -103,7 +103,7 @@
 
   patchLiteSpeedCarouselInitializer();
 
-  /* This file must finish before LiteSpeed executes the source site's delayed Unlimited Elements initializer. */
+  /* Must finish before LiteSpeed executes the source Unlimited Elements initializer. */
   if(!seed()){
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',seed,{once:true});
     else setTimeout(seed,0);
