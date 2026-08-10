@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /source-snapshot.html
+Disallow: /home-v4.html
+Sitemap: https://nashargded2026.vercel.app/sitemap.xml
