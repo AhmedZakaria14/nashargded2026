@@ -1,130 +1,57 @@
-/* Responsive media/layout layer v4 — preserve the cloned desktop design while fixing phone/tablet overflow and scale. */
-html,body{max-width:100%;overflow-x:hidden}
+/* Responsive compatibility v5 — preserve the original cloned layout/motion and only repair media + partner strip. */
+
+/* Do not create custom scroll containers: Elementor/theme keeps ownership of vertical scrolling and sticky/motion effects. */
+html,body{max-width:100%}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+@supports not (overflow:clip){html,body{overflow-x:hidden}}
+
 img,svg,video,canvas{vertical-align:middle}
 picture,figure,.elementor-widget-image,.elementor-image{max-width:100%}
-picture img,figure img,.elementor-widget-image img,.elementor-image img{max-width:100%!important;height:auto!important}
-
-/* Images restored by assets-fix.js must never remain hidden by LiteSpeed/Elementor lazy-load states. */
-img[data-nashar-media-ready="1"],img[data-nashar-media-managed="1"]{visibility:visible!important;opacity:1!important}
-img[data-nashar-media-managed="1"]{object-position:center}
-img[data-nashar-media-error="1"]{visibility:visible!important;opacity:1!important;min-width:1px;min-height:1px}
-
-.elementor-widget-image .elementor-widget-container,.elementor-widget-image a,.elementor-image,.elementor-image a{max-width:100%!important}
-.elementor-widget-image img[data-nashar-media-managed="1"],.elementor-image img[data-nashar-media-managed="1"]{display:block!important;margin-left:auto;margin-right:auto}
 iframe,video{max-width:100%}
 .elementor iframe{max-width:100%!important}
-.elementor video{width:100%;height:auto}
-.elementor-section,.e-con,.elementor-column,.elementor-widget-wrap,.elementor-widget,.elementor-widget-container{min-width:0}
-.elementor-background-overlay{pointer-events:none}
 
-/* Hero media: keep Elementor's exact cover behavior on both desktop and mobile. */
-.elementor-background-video-container{overflow:hidden!important;inset:0!important}
-.elementor-background-video-hosted{width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center center!important}
+/* Recovered media must be visible, without forcing layout dimensions that conflict with Elementor responsive CSS. */
+img[data-nashar-media-ready="1"],img[data-nashar-media-managed="1"],img[data-nashar-media-error="1"]{visibility:visible!important;opacity:1!important}
+img[data-nashar-media-managed="1"]{object-position:center}
+.elementor-widget-image img[data-nashar-media-managed="1"],.elementor-image img[data-nashar-media-managed="1"]{max-width:100%;height:auto}
 
-/* Partner strip — the original site uses a 1065×580 logo canvas and DOES NOT use a 170/200px fixed holder.
-   Recreate that visual canvas so our tight SVG icons appear at the same restrained scale. */
+/* Approved replacement hero video: keep only cover geometry; section sizing/spacing remains the source site's CSS. */
+.elementor-background-video-container{overflow:hidden!important}
+.elementor-background-video-hosted{max-width:none!important;object-fit:cover!important;object-position:center center!important}
+
+/* Partner strip: Owl owns stage widths, transforms, RTL/LTR movement and drag mechanics.
+   Never override .owl-stage display or .owl-item float/width because that breaks native Owl calculations. */
 #uc_logo_carousel_elementor_c98c777{width:100%!important;max-width:100%!important;min-width:0!important;direction:ltr!important;position:relative!important}
-#uc_logo_carousel_elementor_c98c777.owl-carousel{display:block!important}
-#uc_logo_carousel_elementor_c98c777 .owl-stage-outer{overflow:hidden!important;width:100%!important;max-width:100%!important;touch-action:pan-y pinch-zoom!important;-webkit-user-select:none!important;user-select:none!important}
-#uc_logo_carousel_elementor_c98c777 .owl-stage{display:flex!important;align-items:center!important;will-change:transform!important}
-#uc_logo_carousel_elementor_c98c777 .owl-item{float:none!important;display:flex!important;align-items:center!important;min-width:0!important;touch-action:pan-y pinch-zoom!important}
-#uc_logo_carousel_elementor_c98c777 .uc_logo_carousel{width:100%!important;min-width:0!important}
+#uc_logo_carousel_elementor_c98c777 .owl-stage-outer{overflow:hidden!important;width:100%!important;max-width:100%!important;touch-action:pan-y!important;-webkit-user-select:none!important;user-select:none!important;cursor:grab}
+#uc_logo_carousel_elementor_c98c777.owl-drag .owl-stage-outer:active{cursor:grabbing}
+#uc_logo_carousel_elementor_c98c777 .uc_logo_carousel{min-width:0!important}
 #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1065/580!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;box-sizing:border-box!important;padding:8px 10px!important}
-#uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder>a{width:100%!important;height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;touch-action:manipulation!important}
+#uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder>a{width:100%!important;height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important}
 #uc_logo_carousel_elementor_c98c777 img{display:block!important;visibility:visible!important;opacity:1!important;width:auto!important;height:auto!important;max-width:76%!important;max-height:62%!important;object-fit:contain!important;object-position:center!important;user-select:none!important;-webkit-user-drag:none!important;pointer-events:none!important}
 #uc_logo_carousel_elementor_c98c777 .owl-nav,#uc_logo_carousel_elementor_c98c777 .owl-dots{display:none!important}
 
-/* Stable first frame while the original delayed Owl script is loading. */
+/* Stable pre-init frame only. Once Owl adds .owl-loaded, all geometry is returned to Owl. */
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded){display:flex!important;align-items:center!important;gap:10px!important;overflow:hidden!important;width:100%!important;direction:ltr!important}
 #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex:0 0 calc((100% - 30px)/4)!important;width:calc((100% - 30px)/4)!important;max-width:calc((100% - 30px)/4)!important;min-width:0!important}
 
-/* ELNASHARGROUP branding remains controlled only by the brand layer. */
+/* New identity assets remain excluded from generic media sizing. */
 img[data-elnashar-brand],.elnashar-brand-image,.header__logo-2 img,.offcanvas__logo img,.footer__logo img,.footer__logo-2 img{object-fit:contain!important}
 
-@media(max-width:1199px){
-  .elementor-section .elementor-container,.e-con-inner{max-width:100%}
-  .elementor-widget-wrap{min-width:0}
-}
-
 @media(max-width:979px){
-  /* Keep the original responsive carousel density: two logos on tablet/phone. */
   #uc_logo_carousel_elementor_c98c777:not(.owl-loaded)>.uc_logo_carousel{flex:0 0 calc((100% - 10px)/2)!important;width:calc((100% - 10px)/2)!important;max-width:calc((100% - 10px)/2)!important}
 }
 
 @media(max-width:767px){
-  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
-  body{min-width:0!important}
-  main,.elementor,.elementor-section-wrap{width:100%!important;max-width:100%!important;overflow-x:clip}
-  .elementor-section,.elementor-section .elementor-container,.elementor-column,.elementor-widget-wrap,.elementor-widget,.elementor-widget-container,.e-con,.e-con-inner{max-width:100%!important;min-width:0!important}
-  .elementor-column{width:100%}
-  figure{margin-left:0;margin-right:0;max-width:100%}
-  h1,h2,h3,h4,p,a,span{overflow-wrap:break-word}
-  .elementor-button{max-width:100%;white-space:normal}
+  /* Keep touch scrolling native. No global widths, fixed viewport heights, forced columns, or custom hero offsets. */
+  body{min-width:0}
+  figure{max-width:100%}
   .elementor-widget-image img[data-nashar-media-managed="1"],.elementor-image img[data-nashar-media-managed="1"]{max-width:100%!important;height:auto!important}
-
-  /* Header: preserve the current identity but stop it crowding the menu icon on narrow phones. */
-  .header__inner-2{min-height:70px!important;padding:12px 14px!important;gap:10px!important}
-  .header__logo-2{min-width:0!important;max-width:calc(100% - 58px)!important}
-  .header__logo-2 img[src*="elnashargroup-logo"],.header__logo-2 img[alt="logo"],.header__logo-2 img[alt="ELNASHARGROUP"],header img[data-elnashar-brand="logo"]{width:min(172px,52vw)!important;max-width:100%!important;height:auto!important}
-  .header__nav-icon-2{flex:0 0 46px!important;min-width:46px!important}
-  .menu-icon-2,#open_offcanvas{min-width:44px!important;min-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important}
-
-  /* Mobile off-canvas menu: keep all links inside the viewport and make nested services readable. */
-  .offcanvas__area{width:100vw!important;max-width:100vw!important;height:100vh!important;height:100dvh!important;overflow:hidden!important}
-  .offcanvas__body{width:100%!important;max-width:100%!important;grid-template-columns:minmax(0,1fr)!important}
-  .offcanvas__mid{width:100%!important;max-width:100%!important;margin-top:70px!important;padding:10px 18px 28px!important;overflow-x:hidden!important;overflow-y:auto!important}
-  .offcanvas__mid ul{max-width:100%!important;padding-inline:0!important;margin-inline:0!important}
-  .offcanvas__mid li{max-width:100%!important}
-  .offcanvas__mid li>a{display:block!important;max-width:100%!important;font-size:clamp(22px,7vw,29px)!important;line-height:1.35!important;padding:10px 4px!important;white-space:normal!important;overflow-wrap:anywhere!important}
-  .offcanvas__mid li li>a{font-size:18px!important;line-height:1.55!important;padding-block:8px!important}
-  .offcanvas__close{right:14px!important;left:auto!important;top:12px!important}
-  .offcanvas__close button{width:46px!important;height:46px!important;font-size:23px!important}
-
-  /* Mobile hero: viewport-based height and spacing replace the original fixed 750px/260px values. */
-  .elementor-37155 .elementor-element.elementor-element-ff703a9{margin-top:70px!important;margin-bottom:0!important;padding:0!important;overflow:hidden!important;min-height:calc(100svh - 70px)!important}
-  .elementor-37155 .elementor-element.elementor-element-ff703a9>.elementor-container{width:100%!important;min-height:calc(100svh - 70px)!important;max-width:100%!important}
-  .elementor-37155 .elementor-element.elementor-element-ff703a9 .elementor-background-video-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
-  .elementor-37155 .elementor-element.elementor-element-ff703a9 .elementor-background-video-hosted{position:absolute!important;inset:50% auto auto 50%!important;width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;transform:translate(-50%,-50%)!important;object-fit:cover!important;object-position:center center!important}
-  .elementor-37155 .elementor-element.elementor-element-8d5bfb9>.elementor-element-populated{margin:clamp(190px,31svh,270px) 18px 18px!important;padding:0!important}
-  .elementor-37155 .elementor-element.elementor-element-f1ea8f5 .sec-title{font-size:clamp(40px,12vw,54px)!important;line-height:1.15!important;text-align:center!important}
-  .elementor-37155 .elementor-element.elementor-element-60f1613 .sec-title{font-size:clamp(25px,7.8vw,34px)!important;line-height:1.35!important;text-align:center!important}
-  .elementor-37155 .elementor-element.elementor-element-b368048{--margin-top:0px!important;--margin-bottom:8px!important;--margin-left:10px!important;--margin-right:10px!important}
-  .elementor-37155 .elementor-element.elementor-element-9a11a5c.elementor-element{--align-self:center!important}
-  .elementor-37155 .elementor-element.elementor-element-0be5e89{margin:0 0 22px!important;padding:0 0 12px!important;text-align:center!important}
-  .elementor-37155 .elementor-element.elementor-element-0be5e89 .elementor-button{font-size:18px!important;line-height:1.35!important;border-radius:10px!important;padding:15px 30px!important}
-
-  /* General mobile content: prevent oversized fixed typography/spacing from breaking narrow screens. */
-  .elementor-37155 .sec-title:not(.elementor-element-f1ea8f5 .sec-title):not(.elementor-element-60f1613 .sec-title){max-width:100%!important}
-  .service__item{grid-template-columns:minmax(0,1fr)!important;gap:4px!important;padding:22px 0 14px!important}
-  .service__title{font-size:23px!important;line-height:1.4!important;padding:8px 0 12px!important}
-  .service__text{width:100%!important;max-width:100%!important}
-  .service__text p{font-size:15px!important;line-height:1.75!important}
-  .service__link{text-align:right!important}
-  .service__link p{font-size:36px!important}
-  .blog__img-wrapper,.img-box{max-width:100%!important;overflow:hidden!important}
-  .img-box{height:auto!important;min-height:0!important;aspect-ratio:16/10!important}
-  .img-box img{width:100%!important;height:100%!important;object-fit:cover!important}
-  .elementor-form input,.elementor-form select,.elementor-form textarea{max-width:100%!important;font-size:16px!important}
-
-  /* Partner section: stack cleanly and keep the carousel at the same visual logo scale as the source site. */
-  .elementor-37155 .elementor-element.elementor-element-c9303f0>.elementor-container{width:100%!important;max-width:100%!important;flex-wrap:wrap!important}
-  .elementor-37155 .elementor-element.elementor-element-c9303f0 .elementor-column{width:100%!important;max-width:100%!important}
-  .elementor-37155 .elementor-element.elementor-element-32fac31{text-align:center!important;margin-bottom:12px!important}
-  .elementor-37155 .elementor-element.elementor-element-32fac31 .elementor-heading-title{font-size:clamp(26px,7.5vw,36px)!important;line-height:1.3!important;text-align:center!important}
-  #uc_logo_carousel_elementor_c98c777{width:100%!important;max-width:100%!important;margin-inline:auto!important}
-  #uc_logo_carousel_elementor_c98c777 .owl-stage-outer{width:100%!important;overflow:hidden!important;touch-action:pan-y pinch-zoom!important}
-  #uc_logo_carousel_elementor_c98c777 .owl-item{min-width:0!important}
-  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{height:auto!important;min-height:0!important;aspect-ratio:1065/580!important;padding:7px 9px!important}
-  #uc_logo_carousel_elementor_c98c777 img{width:auto!important;height:auto!important;max-width:74%!important;max-height:60%!important}
+  #uc_logo_carousel_elementor_c98c777 .owl-stage-outer{touch-action:pan-y!important}
+  #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{padding:7px 9px!important}
+  #uc_logo_carousel_elementor_c98c777 img{max-width:74%!important;max-height:60%!important}
 }
 
 @media(max-width:390px){
-  .header__inner-2{padding-inline:10px!important}
-  .header__logo-2 img[src*="elnashargroup-logo"],.header__logo-2 img[alt="logo"],.header__logo-2 img[alt="ELNASHARGROUP"],header img[data-elnashar-brand="logo"]{width:min(158px,50vw)!important}
-  .elementor-37155 .elementor-element.elementor-element-8d5bfb9>.elementor-element-populated{margin:clamp(175px,29svh,235px) 14px 14px!important}
-  .elementor-37155 .elementor-element.elementor-element-f1ea8f5 .sec-title{font-size:40px!important}
-  .elementor-37155 .elementor-element.elementor-element-60f1613 .sec-title{font-size:26px!important}
-  .elementor-37155 .elementor-element.elementor-element-0be5e89 .elementor-button{font-size:17px!important;padding:14px 25px!important}
   #uc_logo_carousel_elementor_c98c777 .uc_logo_carousel_holder{padding:6px 8px!important}
   #uc_logo_carousel_elementor_c98c777 img{max-width:72%!important;max-height:58%!important}
 }
