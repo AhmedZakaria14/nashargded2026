@@ -1,8 +1,8 @@
-/* النشار جروب partner strip v7 — seed content only; original Unlimited Elements/Owl owns all motion. */
+/* النشار جروب partner strip v8 — seed content only; original Unlimited Elements/Owl owns all motion. */
 (function(){
   'use strict';
-  if(window.__nasharPartnersV7)return;
-  window.__nasharPartnersV7=true;
+  if(window.__nasharPartnersV8)return;
+  window.__nasharPartnersV8=true;
 
   const ID='uc_logo_carousel_elementor_c98c777';
   const PARTNERS=[
@@ -30,10 +30,34 @@
     ).join('');
   }
 
+  /* Patch ONLY the source carousel initializer before LiteSpeed executes it.
+     The source uses responsive:{0:{items:2},768:{items:2},980:{items:4}}.
+     On phones we need every approved partner visible at once, so only the 0 breakpoint becomes items:5.
+     Owl still owns widths, transforms, autoplay and lifecycle; desktop/tablet settings are untouched. */
+  function patchLiteSpeedCarouselInitializer(){
+    if(window.__nasharPartnersLiteSpeedPatched)return;
+    const original=window.litespeed_load_one;
+    if(typeof original!=='function')return;
+    window.__nasharPartnersLiteSpeedPatched=true;
+    window.litespeed_load_one=function(node,done){
+      try{
+        if(node && node.textContent && node.textContent.indexOf(ID)!==-1 && node.textContent.indexOf('owlCarousel')!==-1){
+          node.textContent=node.textContent.replace(
+            /(responsive\s*:\s*\{\s*0\s*:\s*\{\s*items\s*:\s*)2(\s*\})/,
+            '$15$2'
+          );
+        }
+      }catch(e){
+        console.warn('Partner mobile responsive patch skipped:',e);
+      }
+      return original.call(this,node,done);
+    };
+  }
+
   function addStaticOverrides(){
-    if(document.getElementById('nashar-partners-static-v7'))return;
+    if(document.getElementById('nashar-partners-static-v8'))return;
     const style=document.createElement('style');
-    style.id='nashar-partners-static-v7';
+    style.id='nashar-partners-static-v8';
     style.textContent=`
       html #${ID},html #${ID} .owl-stage-outer,html #${ID} .owl-stage,html #${ID} .owl-item{visibility:visible!important;opacity:1!important}
       html #${ID} [data-nashar-partner] img{filter:none!important;visibility:visible!important;opacity:1!important}
@@ -57,6 +81,7 @@
   }
 
   function seed(){
+    patchLiteSpeedCarouselInitializer();
     addStaticOverrides();
     const root=document.getElementById(ID);
     if(!root)return false;
@@ -69,12 +94,14 @@
     }
 
     root.innerHTML=markup();
-    root.dataset.nasharPartnerSet='nashar-partners-five-v7';
+    root.dataset.nasharPartnerSet='nashar-partners-five-v8';
     root.dataset.partnerCarousel='seeded-for-original-owl';
     root.classList.remove('owl-hidden','owl-loading');
     bindFallbacks(root);
     return true;
   }
+
+  patchLiteSpeedCarouselInitializer();
 
   /* This file must finish before LiteSpeed executes the source site's delayed Unlimited Elements initializer. */
   if(!seed()){
