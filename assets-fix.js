@@ -282,3 +282,66 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 })();
+
+/* Language switch hardening v1 — keep WPML visual markup, but own navigation locally. */
+(function(){
+  'use strict';
+  if(window.__nasharLanguageSwitchHardeningV1)return;
+  window.__nasharLanguageSwitchHardeningV1=true;
+
+  const IS_EN=/^\/en(?:\/|$)/i.test(location.pathname||'/');
+  const TARGET=IS_EN?'/':'/en/';
+  const LABEL=IS_EN?'العربية':'English';
+  const LANG=IS_EN?'ar':'en';
+
+  function isLanguageLink(a){
+    if(!a||a.tagName!=='A')return false;
+    const li=a.closest('li');
+    const cls=((a.className||'')+' '+(li?.className||'')).toLowerCase();
+    const text=(a.textContent||'').trim().toLowerCase();
+    const aria=(a.getAttribute('aria-label')||'').toLowerCase();
+    const href=(a.getAttribute('href')||'').toLowerCase();
+    return /wpml-ls|menu-item-wpml/.test(cls)||text==='english'||text==='العربية'||/switch.*english|switch.*arabic|التبديل إلى/.test(aria)||/adselams\.com\/en\/?$/.test(href);
+  }
+
+  function patch(a){
+    if(!isLanguageLink(a))return false;
+    if(a.getAttribute('href')!==TARGET)a.setAttribute('href',TARGET);
+    a.removeAttribute('target');
+    a.removeAttribute('data-scroll');
+    a.removeAttribute('data-options');
+    a.setAttribute('hreflang',LANG);
+    a.setAttribute('lang',LANG);
+    a.setAttribute('aria-label',IS_EN?'التبديل إلى العربية':'Switch to English');
+    a.dataset.nasharLanguageSwitch='1';
+    const native=a.querySelector('.wpml-ls-native');
+    if(native){native.textContent=LABEL;native.setAttribute('lang',LANG)}
+    else if(a.childElementCount===0)a.textContent=LABEL;
+    return true;
+  }
+
+  function sweep(root){
+    const scope=root&&root.querySelectorAll?root:document;
+    if(root&&root.matches&&root.matches('a'))patch(root);
+    scope.querySelectorAll('a[href],a.wpml-ls-link').forEach(patch);
+  }
+
+  document.addEventListener('click',function(e){
+    const a=e.target&&e.target.closest?e.target.closest('a'):null;
+    if(!patch(a))return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();
+    window.location.assign(TARGET);
+  },true);
+
+  const start=()=>{
+    sweep(document);
+    [50,250,700,1600].forEach(t=>setTimeout(()=>sweep(document),t));
+  };
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
+  document.addEventListener('DOMContentLiteSpeedLoaded',()=>sweep(document));
+  window.addEventListener('load',()=>sweep(document),{once:true});
+})();
