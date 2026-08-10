@@ -1,11 +1,11 @@
-/* النشار جروب partner strip v4 — resilient Owl Carousel with always-visible mobile fallback. */
+/* النشار جروب partner strip v5 — one stable Owl instance; never rebuild on scroll. */
 (function(){
   'use strict';
-  if(window.__nasharPartnersV4)return;
-  window.__nasharPartnersV4=true;
+  if(window.__nasharPartnersV5)return;
+  window.__nasharPartnersV5=true;
 
   const ID='uc_logo_carousel_elementor_c98c777';
-  const SET_VERSION='nashar-partners-five-v4';
+  const SET_VERSION='nashar-partners-five-v5';
   const PARTNERS=[
     {key:'meta',name:'Meta',src:'/assets/partners/meta.svg'},
     {key:'snapchat',name:'Snapchat',src:'/assets/partners/snapchat.svg'},
@@ -13,9 +13,6 @@
     {key:'salla',name:'Salla',src:'/assets/partners/salla.svg'},
     {key:'google',name:'Google',src:'/assets/partners/google.svg'}
   ];
-
-  /* Same responsive geometry and timing feel as the original Unlimited Elements widget,
-     while keeping the approved continuous motion requested for the current site. */
   const CONFIG={
     loop:true,
     center:false,
@@ -35,22 +32,19 @@
     responsive:{0:{items:2},768:{items:2},980:{items:4}}
   };
 
-  let rebuilding=false;
-  let initializedByGuard=false;
-  let repairTimer=0;
+  let initialized=false;
+  let initInProgress=false;
+  let lastWidth=0;
+  let resizeTimer=0;
   let resizeObserver=null;
-  let intersectionObserver=null;
-  let mutationObserver=null;
-  let healthInterval=0;
-  let lastHealthyWidth=0;
 
-  function getEl(){return document.getElementById(ID)}
+  function el(){return document.getElementById(ID)}
   function jq(){return window.jQuery}
 
   function fallbackSvg(name){
     const safe=String(name).replace(/[&<>"']/g,'');
     return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140"><rect width="320" height="140" fill="none"/><text x="160" y="78" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="white">'+safe+'</text></svg>'
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140"><text x="160" y="78" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="white">'+safe+'</text></svg>'
     );
   }
 
@@ -67,17 +61,16 @@
   function ensureImages(root){
     if(!root)return;
     root.querySelectorAll('[data-nashar-partner] img').forEach(img=>{
-      const item=img.closest('[data-nashar-partner]');
-      const p=PARTNERS.find(x=>x.key===item?.getAttribute('data-nashar-partner'));
+      const holder=img.closest('[data-nashar-partner]');
+      const p=PARTNERS.find(x=>x.key===holder?.dataset.nasharPartner);
       if(!p)return;
-      if(!img.dataset.partnerBound){
-        img.dataset.partnerBound='1';
+      if(!img.dataset.partnerErrorBound){
+        img.dataset.partnerErrorBound='1';
         img.addEventListener('error',()=>{
           if(img.dataset.partnerFallback==='1')return;
           img.dataset.partnerFallback='1';
           img.src=fallbackSvg(p.name);
         });
-        img.addEventListener('load',()=>scheduleRepair(40));
       }
       if(img.dataset.partnerFallback!=='1'&&img.getAttribute('src')!==p.src)img.setAttribute('src',p.src);
       img.alt=p.name;
@@ -89,239 +82,151 @@
       img.style.removeProperty('display');
       img.style.removeProperty('visibility');
       img.style.removeProperty('opacity');
-      img.style.removeProperty('width');
-      img.style.removeProperty('height');
     });
   }
 
-  function directKeys(el){
-    return [...el.children]
+  function seedRaw(){
+    const root=el();
+    if(!root)return false;
+    if(root.classList.contains('owl-loaded')){ensureImages(root);return true;}
+    const keys=[...root.children]
       .filter(n=>n.nodeType===1&&n.classList.contains('uc_logo_carousel'))
-      .map(n=>n.getAttribute('data-nashar-partner'));
-  }
-
-  function hasCorrectRawContent(el){
-    const keys=directKeys(el);
-    return keys.length===PARTNERS.length&&PARTNERS.every((p,i)=>keys[i]===p.key);
-  }
-
-  function hasCorrectOwlContent(el){
-    const originals=[...el.querySelectorAll('.owl-stage>.owl-item:not(.cloned) [data-nashar-partner]')];
-    if(!originals.length)return false;
-    const keys=originals.map(n=>n.getAttribute('data-nashar-partner'));
-    return PARTNERS.every(p=>keys.includes(p.key));
-  }
-
-  function resetToRaw(el,$){
-    if(!el)return;
-    if($&&$.fn&&typeof $.fn.owlCarousel==='function'){
-      try{
-        const $el=$(el);
-        if($el.data('owl.carousel'))$el.trigger('destroy.owl.carousel');
-      }catch(e){}
+      .map(n=>n.dataset.nasharPartner||'');
+    const correct=keys.length===PARTNERS.length&&PARTNERS.every((p,i)=>keys[i]===p.key);
+    if(!correct){
+      root.innerHTML=markup();
+      root.dataset.nasharPartnerSet=SET_VERSION;
     }
-    el.classList.remove('owl-loaded','owl-loading','owl-hidden','owl-refresh','owl-drag');
-    el.removeAttribute('style');
-    el.innerHTML=markup();
-    el.dataset.nasharPartnerSet=SET_VERSION;
-    el.dataset.partnerCarousel='fallback-visible';
-    ensureImages(el);
-  }
-
-  function seedVisible(){
-    const el=getEl();
-    if(!el)return false;
-    const $=jq();
-    const loaded=el.classList.contains('owl-loaded');
-    if(!loaded&&!hasCorrectRawContent(el))resetToRaw(el,$);
-    else if(loaded&&!hasCorrectOwlContent(el))resetToRaw(el,$);
-    ensureImages(el);
-    el.classList.remove('owl-hidden','owl-loading');
+    root.classList.remove('owl-hidden','owl-loading');
+    root.dataset.partnerCarousel='visible-preinit';
+    ensureImages(root);
     return true;
   }
 
-  function applyRequiredOptions(instance){
+  function tune(instance){
     if(!instance)return;
-    const required={autoplay:true,autoplayTimeout:3000,autoplayHoverPause:true,autoplaySpeed:1000,smartSpeed:1000,mouseDrag:true,touchDrag:true,pullDrag:true};
-    if(instance.options)Object.assign(instance.options,required);
-    if(instance.settings)Object.assign(instance.settings,required);
+    const req={autoplay:true,autoplayTimeout:3000,autoplayHoverPause:true,autoplaySpeed:1000,smartSpeed:1000,mouseDrag:true,touchDrag:true,pullDrag:true};
+    if(instance.options)Object.assign(instance.options,req);
+    if(instance.settings)Object.assign(instance.settings,req);
   }
 
-  function play($el,instance){
-    try{$el.trigger('play.owl.autoplay',[instance?.settings?.autoplayTimeout||3000,instance?.settings?.autoplaySpeed||instance?.settings?.smartSpeed||1000])}catch(e){}
+  function play(root,$root,instance){
+    root.classList.remove('owl-hidden','owl-loading');
+    ensureImages(root);
+    tune(instance);
+    try{$root.trigger('play.owl.autoplay',[3000,1000])}catch(e){}
+    root.dataset.partnerCarousel='owl-stable';
   }
 
-  function refresh($el,instance){
+  function refreshOnly(){
+    if(!initialized)return;
+    const root=el(),$=jq();
+    if(!root||!$||!$.fn||typeof $.fn.owlCarousel!=='function')return;
+    const $root=$(root),instance=$root.data('owl.carousel');
+    if(!instance)return;
+    const width=root.getBoundingClientRect().width;
+    if(width<2)return;
+    tune(instance);
+    ensureImages(root);
+    root.classList.remove('owl-hidden','owl-loading');
     try{
-      if(instance&&typeof instance.invalidate==='function')instance.invalidate('width');
-      $el.trigger('refresh.owl.carousel');
+      if(typeof instance.invalidate==='function')instance.invalidate('width');
+      $root.trigger('refresh.owl.carousel');
     }catch(e){}
-    play($el,instance);
+    play(root,$root,instance);
+    lastWidth=width;
   }
 
-  function isHealthy(el,instance){
-    if(!el||!instance||!el.classList.contains('owl-loaded'))return false;
-    const width=el.getBoundingClientRect().width;
-    if(width<2)return false;
-    const outer=el.querySelector('.owl-stage-outer');
-    const stage=el.querySelector('.owl-stage');
-    if(!outer||!stage||outer.getBoundingClientRect().width<2||stage.getBoundingClientRect().width<2)return false;
-    const visible=[...el.querySelectorAll('.owl-item:not(.cloned) img')].some(img=>{
-      const r=img.getBoundingClientRect();
-      return r.width>2&&r.height>2&&getComputedStyle(img).display!=='none'&&getComputedStyle(img).visibility!=='hidden';
-    });
-    return visible;
-  }
-
-  function initOrRepair(forceRebuild){
-    const el=getEl();
-    if(!el||rebuilding)return false;
-    seedVisible();
+  function initializeOnce(){
+    if(initInProgress)return false;
+    const root=el();
+    if(!root)return false;
+    seedRaw();
 
     const $=jq();
     if(!$||!$.fn||typeof $.fn.owlCarousel!=='function')return false;
-    const $el=$(el);
-    let instance=$el.data('owl.carousel');
+    const width=root.getBoundingClientRect().width;
+    if(width<2)return false;
 
-    if(forceRebuild||(!instance&&el.classList.contains('owl-loaded'))||(instance&&!hasCorrectOwlContent(el))){
-      rebuilding=true;
-      try{
-        resetToRaw(el,$);
-        instance=null;
-      }finally{
-        rebuilding=false;
-      }
-    }
+    const $root=$(root);
+    let instance=$root.data('owl.carousel');
 
-    const width=el.getBoundingClientRect().width;
-    if(width<2){
-      el.dataset.partnerCarousel='fallback-waiting-width';
-      return false;
-    }
-
-    if(!instance){
-      rebuilding=true;
-      try{
-        $el.off('.nasharPartnersV4');
-        $el.on('initialized.owl.carousel.nasharPartnersV4 refreshed.owl.carousel.nasharPartnersV4 translated.owl.carousel.nasharPartnersV4',function(){
-          ensureImages(el);
-          el.classList.remove('owl-hidden','owl-loading');
-          const i=$el.data('owl.carousel');
-          applyRequiredOptions(i);
-          play($el,i);
-          el.dataset.partnerCarousel='owl-ready';
-        });
-        $el.on('uc_ajax_refreshed.nasharPartnersV4',()=>setTimeout(()=>initOrRepair(false),120));
-        $el.owlCarousel(CONFIG);
-        initializedByGuard=true;
-        instance=$el.data('owl.carousel');
-      }catch(e){
-        console.warn('Partner Owl init:',e);
-        resetToRaw(el,$);
-        return false;
-      }finally{
-        rebuilding=false;
-      }
-    }
-
-    applyRequiredOptions(instance);
-    el.classList.remove('owl-hidden','owl-loading');
-    ensureImages(el);
-    refresh($el,instance);
-    if(isHealthy(el,instance)){
-      lastHealthyWidth=width;
-      el.dataset.partnerCarousel='owl-healthy';
+    /* If Unlimited Elements initialized first, keep that exact instance. Never destroy it. */
+    if(instance&&root.classList.contains('owl-loaded')){
+      initialized=true;
+      lastWidth=width;
+      play(root,$root,instance);
       return true;
     }
-    el.dataset.partnerCarousel='owl-needs-refresh';
-    return false;
+
+    if(initialized)return true;
+    initInProgress=true;
+    try{
+      $root.off('.nasharPartnersV5');
+      $root.on('initialized.owl.carousel.nasharPartnersV5 refreshed.owl.carousel.nasharPartnersV5 translated.owl.carousel.nasharPartnersV5',()=>{
+        const current=$root.data('owl.carousel');
+        if(current){
+          initialized=true;
+          lastWidth=root.getBoundingClientRect().width||lastWidth;
+          play(root,$root,current);
+        }
+      });
+      $root.on('uc_ajax_refreshed.nasharPartnersV5',()=>setTimeout(()=>{
+        const current=$root.data('owl.carousel');
+        if(current){initialized=true;play(root,$root,current);refreshOnly();}
+      },100));
+      $root.owlCarousel(CONFIG);
+      instance=$root.data('owl.carousel');
+      if(instance){
+        initialized=true;
+        lastWidth=width;
+        play(root,$root,instance);
+      }
+    }catch(e){
+      console.warn('Partner Owl stable init:',e);
+      root.classList.remove('owl-hidden','owl-loading');
+      root.dataset.partnerCarousel='visible-fallback';
+      initialized=false;
+    }finally{
+      initInProgress=false;
+    }
+    return initialized;
   }
 
-  function healthCheck(){
-    const el=getEl();
-    if(!el)return;
-    seedVisible();
-    const $=jq();
-    if(!$||!$.fn||typeof $.fn.owlCarousel!=='function')return;
-    const $el=$(el),instance=$el.data('owl.carousel');
-    const width=el.getBoundingClientRect().width;
-    if(width<2)return;
-
-    if(!instance){initOrRepair(false);return;}
-    applyRequiredOptions(instance);
-    el.classList.remove('owl-hidden','owl-loading');
-    ensureImages(el);
-
-    if(!isHealthy(el,instance)){
-      refresh($el,instance);
-      setTimeout(()=>{
-        const current=$el.data('owl.carousel');
-        if(current&&!isHealthy(el,current))initOrRepair(true);
-      },180);
-      return;
-    }
-
-    if(Math.abs(width-lastHealthyWidth)>1){
-      lastHealthyWidth=width;
-      refresh($el,instance);
-    }else{
-      play($el,instance);
-    }
-    el.dataset.partnerCarousel='owl-healthy';
-  }
-
-  function scheduleRepair(delay){
-    clearTimeout(repairTimer);
-    repairTimer=setTimeout(healthCheck,delay==null?80:delay);
-  }
-
-  function observe(){
-    const el=getEl();
-    if(!el)return;
-
-    if('ResizeObserver' in window&&!resizeObserver){
-      resizeObserver=new ResizeObserver(()=>scheduleRepair(90));
-      resizeObserver.observe(el);
-      if(el.parentElement)resizeObserver.observe(el.parentElement);
-    }
-
-    if('IntersectionObserver' in window&&!intersectionObserver){
-      intersectionObserver=new IntersectionObserver(entries=>{
-        if(entries.some(x=>x.isIntersecting&&x.intersectionRatio>0))scheduleRepair(30);
-      },{root:null,rootMargin:'150px 0px',threshold:[0,.01,.25]});
-      intersectionObserver.observe(el);
-    }
-
-    if(!mutationObserver){
-      mutationObserver=new MutationObserver(()=>scheduleRepair(70));
-      mutationObserver.observe(el,{childList:true,attributes:true,attributeFilter:['class']});
-    }
+  function scheduleWidthRefresh(){
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(()=>{
+      const root=el();
+      if(!root)return;
+      const width=root.getBoundingClientRect().width;
+      if(width<2)return;
+      if(!initialized){initializeOnce();return;}
+      if(Math.abs(width-lastWidth)>1)refreshOnly();
+    },120);
   }
 
   function boot(){
-    if(!seedVisible()){
-      setTimeout(boot,150);
-      return;
-    }
-    observe();
-    initOrRepair(false);
-
+    if(!seedRaw()){setTimeout(boot,120);return;}
     let tries=0;
-    const poll=setInterval(()=>{
+    const wait=setInterval(()=>{
       tries++;
-      healthCheck();
-      if((jq()?.fn&&typeof jq().fn.owlCarousel==='function'&&getEl()?.dataset.partnerCarousel==='owl-healthy')||tries>=100)clearInterval(poll);
-    },150);
+      if(initializeOnce()||tries>=80)clearInterval(wait);
+    },100);
 
-    if(!healthInterval)healthInterval=setInterval(healthCheck,8000);
+    const root=el();
+    if(root&&'ResizeObserver' in window){
+      resizeObserver=new ResizeObserver(scheduleWidthRefresh);
+      resizeObserver.observe(root);
+    }
   }
 
-  window.addEventListener('resize',()=>scheduleRepair(100),{passive:true});
-  window.addEventListener('orientationchange',()=>{scheduleRepair(150);setTimeout(healthCheck,500)},{passive:true});
-  window.addEventListener('pageshow',()=>scheduleRepair(30));
-  window.addEventListener('load',()=>{scheduleRepair(30);setTimeout(healthCheck,350)},{once:true});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRepair(30)});
-  document.addEventListener('DOMContentLiteSpeedLoaded',()=>{scheduleRepair(20);setTimeout(healthCheck,250)});
+  /* Deliberately no scroll, IntersectionObserver, MutationObserver or periodic rebuild health checks. */
+  window.addEventListener('resize',scheduleWidthRefresh,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(refreshOnly,250),{passive:true});
+  window.addEventListener('pageshow',()=>setTimeout(()=>{if(!initializeOnce())refreshOnly()},60));
+  window.addEventListener('load',()=>setTimeout(()=>{initializeOnce();refreshOnly()},250),{once:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{initializeOnce();refreshOnly()},80)});
+  document.addEventListener('DOMContentLiteSpeedLoaded',()=>setTimeout(()=>{initializeOnce();refreshOnly()},160));
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
