@@ -1,4 +1,8 @@
 /* Compatibility layer for the cloned source. Keep this limited to missing fonts/icons/menu helpers; source CSS owns layout and motion. */
+/* Critical loader failsafe: the historical #boot element must NEVER cover the rendered site. */
+#boot{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;z-index:-1!important;width:0!important;height:0!important;overflow:hidden!important}
+html,body{min-height:100%;}
+
 @font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-solid-900.woff2') format('woff2')}
 @font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-regular-400.woff2') format('woff2')}
 @font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:block;src:url('/origin/wp-content/plugins/wp-font-awesome/font-awesome/fonts/fa-brands-400.woff2') format('woff2')}
