@@ -1,4 +1,4 @@
-/* النشار جروب — single lightweight brand authority. */
+/* النشار جروب — single lightweight brand authority, isolated from motion/scroll updates. */
 (function(){
   'use strict';
   if(window.__nasharBrandStabilityActive)return;
@@ -26,7 +26,9 @@
   function patchTextNode(node){
     if(!node||node.nodeType!==3)return;
     const p=node.parentElement;if(!p||SKIP.has(p.tagName))return;
-    const next=textBrand(node.nodeValue);if(next!==node.nodeValue)node.nodeValue=next;
+    const raw=node.nodeValue||'';
+    if(!/Adsela|أدسيلا|ادسيلا|Nashar\s+Digital|نشار\s+ديجيتال|ELNASHARGROUP|adselams\.com|nashar\.digital/i.test(raw))return;
+    const next=textBrand(raw);if(next!==raw)node.nodeValue=next;
   }
   function patchImg(img){
     if(!img||img.tagName!=='IMG')return;
@@ -108,12 +110,12 @@
     if(observer||!target)return;
     observer=new MutationObserver(records=>{
       for(const r of records){
-        if(r.type==='characterData'){patchTextNode(r.target);continue}
         if(r.type==='attributes'){if(r.target.tagName==='IMG')patchImg(r.target);continue}
         r.addedNodes.forEach(patchSubtree);
       }
     });
-    observer.observe(target,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['src','data-src','srcset','data-srcset','alt']});
+    /* Do not observe characterData: counters/type effects may update text every animation frame. */
+    observer.observe(target,{childList:true,subtree:true,attributes:true,attributeFilter:['src','data-src','srcset','data-srcset','alt']});
   }
   function start(){
     patchHead();
@@ -126,6 +128,5 @@
     document.addEventListener('DOMContentLiteSpeedLoaded',patchHead,{once:true});
   }
 
-  /* Start immediately. At the normal body-end load point this runs before DOMContentLoaded. */
   start();
 })();
