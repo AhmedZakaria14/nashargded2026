@@ -204,3 +204,13 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })();
+
+/* Load the isolated hero-video controller without changing the carousel or page structure. */
+(function(){
+  if(window.__elnasharHeroVideoLoader)return;
+  window.__elnasharHeroVideoLoader=true;
+  const s=document.createElement('script');
+  s.src='/hero-video-fix.js?v=1';
+  s.async=false;
+  (document.head||document.documentElement).appendChild(s);
+})();
