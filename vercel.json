@@ -1,25 +1,40 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": true,
   "headers": [
     {
       "source": "/",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
         { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
+        { "key": "Expires", "value": "0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "X-Robots-Tag", "value": "index, follow" }
       ]
     },
     {
       "source": "/home-v4.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "X-Robots-Tag", "value": "noindex, follow" }
       ]
     },
     {
-      "source": "/exact-source/",
+      "source": "/source-snapshot.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/brand-stability.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
       ]
     },
     {
@@ -36,8 +51,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/home-v4.html" },
-
     { "source": "/wp-content/uploads/:year/:month/Adsela-new-logo2.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
     { "source": "/wp-content/uploads/:year/:month/Adsela-new-logo2.png.webp", "destination": "/assets/elnashargroup-logo-v3.svg" },
     { "source": "/wp-content/uploads/:year/:month/adsela-new-logo.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
@@ -68,28 +81,27 @@
     { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-32x32.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
     { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-192x192.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
 
-    { "source": "/exact-source/", "destination": "/index.html" },
     { "source": "/origin/:path*", "destination": "https://adselams.com/:path*" },
 
-    { "source": "/about-us/", "destination": "/home-v4.html" },
-    { "source": "/services/", "destination": "/home-v4.html" },
-    { "source": "/seo/", "destination": "/home-v4.html" },
-    { "source": "/digital-ads-2/", "destination": "/home-v4.html" },
-    { "source": "/social-media/", "destination": "/home-v4.html" },
-    { "source": "/website-dev/", "destination": "/home-v4.html" },
-    { "source": "/e-commerce-solutions/", "destination": "/home-v4.html" },
-    { "source": "/creatives-designs/", "destination": "/home-v4.html" },
-    { "source": "/motion-graphic/", "destination": "/home-v4.html" },
-    { "source": "/mobile-application/", "destination": "/home-v4.html" },
-    { "source": "/influencers-marketing/", "destination": "/home-v4.html" },
-    { "source": "/portfolio/", "destination": "/home-v4.html" },
-    { "source": "/blog/", "destination": "/home-v4.html" },
-    { "source": "/blog/:path*", "destination": "/home-v4.html" },
-    { "source": "/contact-us/", "destination": "/home-v4.html" },
-    { "source": "/faq/", "destination": "/home-v4.html" },
-    { "source": "/careers/", "destination": "/home-v4.html" },
-    { "source": "/privacy-policy/", "destination": "/home-v4.html" },
-    { "source": "/en/", "destination": "/home-v4.html" },
+    { "source": "/about-us/", "destination": "/index.html" },
+    { "source": "/services/", "destination": "/index.html" },
+    { "source": "/seo/", "destination": "/index.html" },
+    { "source": "/digital-ads-2/", "destination": "/index.html" },
+    { "source": "/social-media/", "destination": "/index.html" },
+    { "source": "/website-dev/", "destination": "/index.html" },
+    { "source": "/e-commerce-solutions/", "destination": "/index.html" },
+    { "source": "/creatives-designs/", "destination": "/index.html" },
+    { "source": "/motion-graphic/", "destination": "/index.html" },
+    { "source": "/mobile-application/", "destination": "/index.html" },
+    { "source": "/influencers-marketing/", "destination": "/index.html" },
+    { "source": "/portfolio/", "destination": "/index.html" },
+    { "source": "/blog/", "destination": "/index.html" },
+    { "source": "/blog/:path*", "destination": "/index.html" },
+    { "source": "/contact-us/", "destination": "/index.html" },
+    { "source": "/faq/", "destination": "/index.html" },
+    { "source": "/careers/", "destination": "/index.html" },
+    { "source": "/privacy-policy/", "destination": "/index.html" },
+    { "source": "/en/", "destination": "/index.html" },
 
     { "source": "/wp-content/plugins/:path*", "destination": "https://adselams.com/wp-content/plugins/:path*" },
     { "source": "/wp-content/themes/:path*", "destination": "https://adselams.com/wp-content/themes/:path*" },
