@@ -18,6 +18,15 @@
       ]
     },
     {
+      "source": "/en/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "X-Robots-Tag", "value": "index, follow" }
+      ]
+    },
+    {
       "source": "/home-v4.html",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
@@ -164,6 +173,7 @@
     { "source": "/careers/", "destination": "/index.html" },
     { "source": "/privacy-policy/", "destination": "/index.html" },
     { "source": "/en/", "destination": "/index.html" },
+    { "source": "/en/:path*", "destination": "/index.html" },
 
     { "source": "/wp-content/plugins/:path*", "destination": "https://adselams.com/wp-content/plugins/:path*" },
     { "source": "/wp-content/themes/:path*", "destination": "https://adselams.com/wp-content/themes/:path*" },
