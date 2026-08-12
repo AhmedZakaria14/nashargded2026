@@ -125,7 +125,7 @@
   if(window.__nasharMediaCssHardeningLoader)return;
   window.__nasharMediaCssHardeningLoader=true;
   const s=document.createElement('script');
-  s.src='/media-css-hardening.js?v=1';
+  s.src='/media-css-hardening.js?v=2';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
