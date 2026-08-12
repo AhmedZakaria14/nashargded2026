@@ -1,8 +1,8 @@
-/* asset recovery v18: restore cloned media and LiteSpeed scripts without competing with Elementor motion/scroll runtimes. */
+/* asset recovery v19: resilient cloned-media recovery with server fallback, without competing with Elementor/Owl motion. */
 (function(){
   'use strict';
-  if(window.__nasharAssetsV18)return;
-  window.__nasharAssetsV18=true;
+  if(window.__nasharAssetsV19)return;
+  window.__nasharAssetsV19=true;
 
   const ORIGIN='https://adselams.com/';
   const ORIGIN_HOST='adselams.com';
@@ -14,12 +14,32 @@
   const isPlaceholder=u=>!u||/^data:image\/(?:svg\+xml|gif)/i.test(u)||/^about:blank$/i.test(u);
   const isSpecial=u=>/^(?:data:|blob:|javascript:|#)/i.test((u||'').trim());
 
+  function originAbsolute(url){
+    if(!url||typeof url!=='string')return '';
+    const u=url.trim();
+    if(!u||isSpecial(u))return '';
+    if(u.startsWith('/api/media?')){
+      try{return new URL(u,location.origin).searchParams.get('u')||''}catch(e){return ''}
+    }
+    if(u.startsWith('/origin/'))return ORIGIN+u.slice('/origin/'.length);
+    if(u.startsWith('//'+ORIGIN_HOST+'/'))return 'https:'+u;
+    if(/^https?:\/\/(?:www\.)?adselams\.com\//i.test(u))return u.replace(/^http:/i,'https:');
+    if(/^\/?(?:wp-content|wp-includes)\//i.test(u))return ORIGIN+u.replace(/^\//,'');
+    return '';
+  }
+
+  function mediaProxy(url){
+    const abs=originAbsolute(url);
+    return abs?'/api/media?u='+encodeURIComponent(abs):url;
+  }
+
   function proxy(url){
     if(!url||typeof url!=='string')return url;
     const u=url.trim();
     if(!u||isSpecial(u))return u;
     if(u.startsWith('//'+ORIGIN_HOST+'/'))return '/origin/'+u.slice(ORIGIN_HOST.length+3);
     if(u.startsWith(ORIGIN))return '/origin/'+u.slice(ORIGIN.length);
+    if(u.startsWith('http://'+ORIGIN_HOST+'/'))return '/origin/'+u.slice(('http://'+ORIGIN_HOST+'/').length);
     return u;
   }
 
@@ -27,12 +47,13 @@
     if(!url||typeof url!=='string')return url;
     const u=url.trim();
     if(u.startsWith('/origin/'))return ORIGIN+u.slice('/origin/'.length);
-    return u;
+    const abs=originAbsolute(u);
+    return abs||u;
   }
 
   function srcset(value,mode){
     if(!value)return value;
-    const fn=mode==='direct'?direct:proxy;
+    const fn=mode==='direct'?direct:mode==='server'?mediaProxy:proxy;
     return value.split(',').map(part=>{
       const bits=part.trim().split(/\s+/);
       if(bits[0])bits[0]=fn(bits[0]);
@@ -50,7 +71,8 @@
 
   function remember(el,url){
     if(!el||!url||isPlaceholder(url))return;
-    if(!el.dataset.nasharOriginalSrc)el.dataset.nasharOriginalSrc=url;
+    const abs=originAbsolute(url)||url;
+    if(!el.dataset.nasharOriginalSrc)el.dataset.nasharOriginalSrc=abs;
   }
 
   function markReady(el){
@@ -62,13 +84,22 @@
     el.style.removeProperty('opacity');
   }
 
+  function rewriteStyleUrls(style){
+    if(!style||typeof style!=='string')return style;
+    return style.replace(/url\(\s*(['"]?)([^)'"\s]+)\1\s*\)/gi,(all,q,url)=>{
+      const abs=originAbsolute(url);
+      if(!abs)return all;
+      return 'url("'+mediaProxy(abs)+'")';
+    });
+  }
+
   function restoreBackground(el){
     if(!el||!el.getAttribute)return;
     const bgAttrs=['data-bg','data-bg-hidpi','data-background-image','data-dce-background-image-url','data-dce-background-overlay-image-url'];
     for(const attr of bgAttrs){
       const val=el.getAttribute(attr);
       if(!val)continue;
-      const chosen=(attr==='data-bg-hidpi'&&window.devicePixelRatio<=1)?null:proxy(val);
+      const chosen=(attr==='data-bg-hidpi'&&window.devicePixelRatio<=1)?null:mediaProxy(val);
       if(chosen){
         if(attr.includes('overlay'))el.style.setProperty('--nashar-overlay-image','url("'+chosen+'")');
         else el.style.backgroundImage='url("'+chosen+'")';
@@ -76,7 +107,8 @@
       if(attr==='data-bg'||attr==='data-bg-hidpi'||attr==='data-background-image')el.removeAttribute(attr);
     }
     const style=el.getAttribute('style');
-    if(style&&/https?:\/\/adselams\.com\//i.test(style))el.setAttribute('style',style.replace(/https?:\/\/adselams\.com\//gi,'/origin/'));
+    const fixed=rewriteStyleUrls(style);
+    if(fixed&&fixed!==style)el.setAttribute('style',fixed);
   }
 
   function restoreElement(el){
@@ -93,7 +125,7 @@
       remember(el,lazySrc);
       if(isPlaceholder(current)||current!==proxy(lazySrc))el.setAttribute('src',proxy(lazySrc));
       ['data-src','data-lazy-src','data-original','data-lazyload'].forEach(a=>el.removeAttribute(a));
-    }else if(current&&/^https?:\/\/adselams\.com\//i.test(current)&&el.dataset.nasharAllowDirect!=='1'){
+    }else if(current&&/^https?:\/\/(?:www\.)?adselams\.com\//i.test(current)&&el.dataset.nasharAllowDirect!=='1'){
       remember(el,current);
       el.setAttribute('src',proxy(current));
     }else if(current&&!isPlaceholder(current))remember(el,current);
@@ -104,14 +136,16 @@
       el.setAttribute('srcset',srcset(lazySet,'proxy'));
       el.removeAttribute('data-srcset');
       el.removeAttribute('data-lazy-srcset');
-    }else if(currentSet&&/https?:\/\/adselams\.com\//i.test(currentSet)&&el.dataset.nasharAllowDirect!=='1')el.setAttribute('srcset',srcset(currentSet,'proxy'));
+    }else if(currentSet&&/https?:\/\/(?:www\.)?adselams\.com\//i.test(currentSet)&&el.dataset.nasharAllowDirect!=='1'){
+      el.setAttribute('srcset',srcset(currentSet,'proxy'));
+    }
 
     const sizes=el.getAttribute('data-sizes');
     if(sizes){el.setAttribute('sizes',sizes);el.removeAttribute('data-sizes')}
 
     const poster=el.getAttribute('data-poster');
-    if(poster){el.setAttribute('poster',proxy(poster));el.removeAttribute('data-poster')}
-    else if(el.getAttribute('poster')&&/^https?:\/\/adselams\.com\//i.test(el.getAttribute('poster')))el.setAttribute('poster',proxy(el.getAttribute('poster')));
+    if(poster){el.setAttribute('poster',mediaProxy(poster));el.removeAttribute('data-poster')}
+    else if(el.getAttribute('poster')&&originAbsolute(el.getAttribute('poster')))el.setAttribute('poster',mediaProxy(el.getAttribute('poster')));
 
     if(el.hasAttribute('data-lazyloaded'))el.removeAttribute('data-lazyloaded');
     if(tag==='IMG'){
@@ -128,43 +162,91 @@
     if(scope.querySelectorAll)scope.querySelectorAll('img,source,iframe,video,[data-bg],[data-bg-hidpi],[data-background-image],[data-dce-background-image-url],[data-dce-background-overlay-image-url],[style]').forEach(restoreElement);
   }
 
+  function disableBrokenPictureSources(img){
+    const picture=img&&img.closest?img.closest('picture'):null;
+    if(!picture)return;
+    picture.querySelectorAll('source').forEach(source=>{
+      ['srcset','data-srcset','data-lazy-srcset','data-src','data-lazy-src'].forEach(attr=>{
+        const value=source.getAttribute(attr);
+        if(value&&!source.dataset['nasharSaved'+attr.replace(/[^a-z]/gi,'')])source.dataset['nasharSaved'+attr.replace(/[^a-z]/gi,'')]=value;
+        source.removeAttribute(attr);
+      });
+    });
+  }
+
   function candidateList(img){
     const list=[];
     const add=u=>{if(u&&!isPlaceholder(u)&&!list.includes(u))list.push(u)};
     const cur=img.currentSrc||img.getAttribute('src')||'';
     const original=img.dataset.nasharOriginalSrc||'';
-    add(cur.startsWith('/origin/')?direct(cur):proxy(cur));
-    add(cur.startsWith('/origin/')?cur:direct(cur));
-    add(proxy(original));
-    add(direct(original));
+    const primary=original||originAbsolute(cur)||cur;
+
+    add(mediaProxy(primary));
+    add(proxy(primary));
+    add(direct(primary));
+    add(mediaProxy(cur));
+    add(proxy(cur));
+    add(direct(cur));
+
     const set=img.getAttribute('srcset')||'';
-    set.split(',').forEach(p=>{const u=p.trim().split(/\s+/)[0];add(proxy(u));add(direct(u))});
+    set.split(',').forEach(p=>{
+      const u=p.trim().split(/\s+/)[0];
+      add(mediaProxy(u));add(proxy(u));add(direct(u));
+    });
+
     [...list].forEach(u=>{
-      if(/\.webp(?:\?.*)?$/i.test(u))add(u.replace(/\.webp(\?.*)?$/i,'$1'));
-      if(/\?.+/.test(u))add(u.split('?')[0]);
+      if(/\.webp(?:\?.*)?$/i.test(u)){
+        const noWebp=u.replace(/\.webp(\?.*)?$/i,'$1');
+        add(noWebp);add(mediaProxy(noWebp));
+      }
+      if(/\?.+/.test(u)){
+        const noQuery=u.split('?')[0];
+        add(noQuery);add(mediaProxy(noQuery));
+      }
     });
     return list;
   }
 
   function recoverBrokenImage(img){
-    if(!img||isBrandImage(img))return;
+    if(!img||isBrandImage(img)||img.dataset.nasharRecoveryBusy==='1')return;
     img.dataset.nasharMediaError='1';
+    img.dataset.nasharRecoveryBusy='1';
+    disableBrokenPictureSources(img);
+
     const candidates=candidateList(img);
     let tried=[];
     try{tried=JSON.parse(img.dataset.nasharTried||'[]')}catch(e){}
-    const next=candidates.find(u=>!tried.includes(u));
+    const current=img.getAttribute('src')||'';
+    const next=candidates.find(u=>u&&u!==current&&!tried.includes(u));
     if(next){
       tried.push(next);
-      img.dataset.nasharTried=JSON.stringify(tried.slice(-12));
-      if(/^https?:\/\/adselams\.com\//i.test(next))img.dataset.nasharAllowDirect='1';else delete img.dataset.nasharAllowDirect;
+      img.dataset.nasharTried=JSON.stringify(tried.slice(-20));
+      if(/^https?:\/\/(?:www\.)?adselams\.com\//i.test(next))img.dataset.nasharAllowDirect='1';else delete img.dataset.nasharAllowDirect;
       img.removeAttribute('srcset');
+      img.removeAttribute('sizes');
       img.setAttribute('src',next);
       img.style.removeProperty('visibility');
       img.style.removeProperty('opacity');
+      setTimeout(()=>{delete img.dataset.nasharRecoveryBusy},0);
       return;
     }
+
+    delete img.dataset.nasharRecoveryBusy;
     img.style.setProperty('visibility','visible','important');
     img.style.setProperty('opacity','1','important');
+  }
+
+  function healthCheck(root){
+    const scope=root&&root.querySelectorAll?root:document;
+    scope.querySelectorAll('img').forEach(img=>{
+      if(isBrandImage(img))return;
+      restoreElement(img);
+      const src=img.getAttribute('src')||'';
+      if(img.complete&&src&&!isPlaceholder(src)){
+        if(img.naturalWidth>0)markReady(img);
+        else recoverBrokenImage(img);
+      }
+    });
   }
 
   function stabilizeReferenceAreas(){
@@ -219,6 +301,7 @@
     }
     emitLiteSpeedReady();
     restoreMedia(document);
+    healthCheck(document);
     stabilizeReferenceAreas();
     [100,450,1200].forEach(t=>setTimeout(refreshMotionGeometry,t));
   }
@@ -228,37 +311,38 @@
     delayedStarted=true;
     rewriteDelayedScriptSources();
 
-    /* Prefer LiteSpeed's own loader. It already knows the correct execution/event order used by the source site. */
     if(typeof window.litespeed_load_delayed_js_force==='function'){
       try{
         window.litespeed_load_delayed_js_force();
-        setTimeout(()=>{restoreMedia(document);stabilizeReferenceAreas();refreshMotionGeometry()},300);
+        setTimeout(()=>{restoreMedia(document);healthCheck(document);stabilizeReferenceAreas();refreshMotionGeometry()},300);
         setTimeout(refreshMotionGeometry,1100);
         return;
       }catch(e){console.warn('LiteSpeed delayed JS restore:',e)}
     }
 
-    /* Fallback takes ownership by REPLACING delayed tags, so the original loader cannot execute them a second time later. */
     manualDelayedScripts().catch(e=>console.warn('Manual delayed JS restore:',e));
   }
 
-  function sweep(){restoreMedia(document);stabilizeReferenceAreas()}
+  function sweep(){restoreMedia(document);healthCheck(document);stabilizeReferenceAreas()}
 
   function start(){
-    document.addEventListener('load',e=>{if(e.target&&e.target.tagName==='IMG')markReady(e.target)},true);
-    document.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG')recoverBrokenImage(e.target)},true);
+    document.addEventListener('load',e=>{
+      if(e.target&&e.target.tagName==='IMG')markReady(e.target);
+    },true);
+    document.addEventListener('error',e=>{
+      if(e.target&&e.target.tagName==='IMG')recoverBrokenImage(e.target);
+    },true);
     document.addEventListener('DOMContentLiteSpeedLoaded',()=>{
-      [0,300,1000].forEach(t=>setTimeout(refreshMotionGeometry,t));
+      [0,250,700,1500].forEach(t=>setTimeout(()=>{healthCheck(document);refreshMotionGeometry()},t));
     },{once:true});
-    window.addEventListener('load',()=>setTimeout(refreshMotionGeometry,100),{once:true});
+    window.addEventListener('load',()=>setTimeout(()=>{healthCheck(document);refreshMotionGeometry()},100),{once:true});
 
     sweep();
     rewriteDelayedScriptSources();
     setTimeout(forceDelayedScripts,100);
-    [300,1000,2200,4500].forEach(t=>setTimeout(sweep,t));
+    [250,700,1500,3000,6000,10000].forEach(t=>setTimeout(sweep,t));
 
-    /* Critical mobile-scroll fix: never observe `style`. Elementor/GSAP/Waypoints update transforms/styles while scrolling.
-       Watching those mutations created a repair loop on every animation frame. */
+    /* Never observe style: Elementor/GSAP/Waypoints mutate it every animation frame. */
     const mo=new MutationObserver(ms=>{
       if(mutationScheduled)return;
       mutationScheduled=true;
@@ -266,7 +350,7 @@
         mutationScheduled=false;
         for(const m of ms){
           if(m.type==='attributes')restoreElement(m.target);
-          else m.addedNodes.forEach(n=>{if(n.nodeType===1)restoreMedia(n)});
+          else m.addedNodes.forEach(n=>{if(n.nodeType===1){restoreMedia(n);healthCheck(n)}});
         }
         stabilizeReferenceAreas();
       });
