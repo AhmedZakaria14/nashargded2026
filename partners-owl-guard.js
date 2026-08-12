@@ -120,12 +120,12 @@
   (document.head||document.documentElement).appendChild(s);
 })();
 
-/* Recover image URLs embedded in Elementor/theme CSS. Isolated from Owl and motion styles. */
+/* Recover source images and permanently purge legacy brand marks embedded in CSS. */
 (function(){
   if(window.__nasharMediaCssHardeningLoader)return;
   window.__nasharMediaCssHardeningLoader=true;
   const s=document.createElement('script');
-  s.src='/media-css-hardening.js?v=2';
+  s.src='/media-css-hardening.js?v=3';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
