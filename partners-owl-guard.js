@@ -120,69 +120,12 @@
   (document.head||document.documentElement).appendChild(s);
 })();
 
-/* Recover source images and permanently purge legacy brand marks embedded in CSS. */
+/* Recover image URLs embedded in Elementor/theme CSS. Isolated from Owl and motion styles. */
 (function(){
   if(window.__nasharMediaCssHardeningLoader)return;
   window.__nasharMediaCssHardeningLoader=true;
   const s=document.createElement('script');
-  s.src='/media-css-hardening.js?v=3';
+  s.src='/media-css-hardening.js?v=2';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
-})();
-
-/* The source off-canvas menu also contains a legacy brand emblem at
-   wp-content/themes/axtra/assets/images/shape/111222.png. It is not a generic decoration:
-   purge it anywhere it is injected and use the approved Nashar icon instead. */
-(function(){
-  'use strict';
-  if(window.__nasharLegacyMenuEmblemV1)return;
-  window.__nasharLegacyMenuEmblemV1=true;
-
-  const ICON='/assets/elnashargroup-icon-v3.svg';
-  const LEGACY=/\/(?:origin\/)?wp-content\/themes\/[^/]+\/assets\/images\/shape\/111222\.png(?:\.webp)?(?:[?#]|$)|(?:^|\/)111222\.png(?:\.webp)?(?:[?#]|$)/i;
-
-  function isLegacy(img){
-    if(!img||img.tagName!=='IMG')return false;
-    return ['src','data-src','data-lazy-src','data-original','srcset','data-srcset','data-lazy-srcset']
-      .some(attr=>LEGACY.test(img.getAttribute(attr)||''));
-  }
-
-  function replace(img){
-    if(!isLegacy(img)&&!img.matches?.('.offcanvas__right .shape-1[data-nashar-legacy-emblem]'))return;
-    img.setAttribute('src',ICON);
-    img.setAttribute('alt','النشار جروب');
-    ['srcset','data-src','data-lazy-src','data-original','data-lazyload','data-srcset','data-lazy-srcset','data-sizes'].forEach(attr=>img.removeAttribute(attr));
-    img.dataset.elnasharBrand='icon';
-    img.dataset.nasharLegacyEmblem='replaced';
-    img.style.setProperty('object-fit','contain','important');
-    img.style.setProperty('object-position','center','important');
-    img.style.setProperty('visibility','visible','important');
-    img.style.setProperty('opacity','1','important');
-  }
-
-  function sweep(root){
-    const scope=root&&root.querySelectorAll?root:document;
-    if(root&&root.tagName==='IMG'&&(isLegacy(root)||root.matches?.('.offcanvas__right .shape-1')))replace(root);
-    scope.querySelectorAll&&scope.querySelectorAll('.offcanvas__right img.shape-1,img[src*="111222.png"],img[data-src*="111222.png"],img[data-lazy-src*="111222.png"],img[data-original*="111222.png"]').forEach(img=>{
-      if(img.matches('.offcanvas__right .shape-1'))img.dataset.nasharLegacyEmblem='1';
-      replace(img);
-    });
-  }
-
-  function start(){
-    sweep(document);
-    [0,120,450,1200,3000].forEach(ms=>setTimeout(()=>sweep(document),ms));
-    const mo=new MutationObserver(records=>{
-      records.forEach(record=>{
-        if(record.type==='attributes')replace(record.target);
-        else record.addedNodes.forEach(node=>{if(node.nodeType===1)sweep(node)});
-      });
-    });
-    mo.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src','data-src','data-lazy-src','data-original','srcset','data-srcset','data-lazy-srcset']});
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
-  else start();
-  document.addEventListener('DOMContentLiteSpeedLoaded',()=>sweep(document));
-  window.addEventListener('load',()=>sweep(document),{once:true});
 })();

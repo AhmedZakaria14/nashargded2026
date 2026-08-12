@@ -1,44 +1,19 @@
-/* Media CSS hardening v3 — recover source images while permanently replacing every legacy Adsela brand mark. */
+/* Media CSS hardening v2 — recover image URLs embedded in style tags/CSS rules and neutralize stuck Elementor background lazy suppression without touching motion styles. */
 (function(){
   'use strict';
-  if(window.__nasharMediaCssHardeningV3)return;
-  window.__nasharMediaCssHardeningV3=true;
+  if(window.__nasharMediaCssHardeningV2)return;
+  window.__nasharMediaCssHardeningV2=true;
 
   const SOURCE='https://adselams.com/';
-  const LOGO='/assets/elnashargroup-logo-v3.svg';
-  const ICON='/assets/elnashargroup-icon-v3.svg';
   const IMAGE_RE=/\.(?:avif|bmp|gif|ico|jpe?g|png|svg|webp)(?:[?#]|$)/i;
-  const OLD_BRAND_ASSET=/(?:adsela|adselams)[^?#/]*(?:logo|icon|fav)|(?:logo|icon|fav)[^?#/]*(?:adsela|adsel)|logo[-_ ]?adsela[-_ ]?half|adsela[-_ ]?icon[-_ ]?footer|cropped[-_ ]?fav[-_ ]?icon|logo[-_ ]?png[-_ ]?white[-_ ]?01/i;
   let scheduled=false;
-
-  function decoded(value){
-    let out=String(value||'');
-    for(let i=0;i<2;i++){
-      try{const next=decodeURIComponent(out);if(next===out)break;out=next}catch(e){break}
-    }
-    return out;
-  }
-
-  function brandAsset(raw){
-    const value=decoded(raw);
-    if(!OLD_BRAND_ASSET.test(value))return '';
-    return /icon|fav|half|footer/i.test(value)?ICON:LOGO;
-  }
 
   function sourceAbsolute(raw){
     if(!raw||typeof raw!=='string')return '';
     const value=raw.trim();
-    if(!value||/^(?:data:|blob:|#|javascript:)/i.test(value))return '';
+    if(!value||/^(?:data:|blob:|#|javascript:)/i.test(value)||value.startsWith('/api/media?'))return '';
 
     try{
-      if(value.startsWith('/api/media?')){
-        const u=new URL(value,location.origin);
-        const direct=u.searchParams.get('u');
-        if(direct)return direct;
-        const path=u.searchParams.get('path');
-        if(path)return SOURCE+path.replace(/^\/+/, '');
-        return '';
-      }
       if(value.startsWith('/origin/'))return SOURCE+value.slice('/origin/'.length);
       if(/^\/?(?:wp-content|wp-includes)\//i.test(value))return SOURCE+value.replace(/^\//,'');
       if(value.startsWith('//adselams.com/'))return 'https:'+value;
@@ -57,12 +32,8 @@
   }
 
   function mediaUrl(raw){
-    const branded=brandAsset(raw);
-    if(branded)return branded;
     const abs=sourceAbsolute(raw);
     if(!abs||!IMAGE_RE.test(abs))return raw;
-    const sourceBrand=brandAsset(abs);
-    if(sourceBrand)return sourceBrand;
     return '/api/media?u='+encodeURIComponent(abs);
   }
 
@@ -87,8 +58,8 @@
     try{
       if(rule.style){
         Array.from(rule.style).forEach(function(prop){
+          if(!/(?:background|mask|border-image|list-style|content|(?:^--)\S*(?:image|background))/i.test(prop))return;
           const value=rule.style.getPropertyValue(prop);
-          if(!value||value.indexOf('url(')===-1)return;
           const next=rewriteUrls(value);
           if(next!==value)rule.style.setProperty(prop,next,rule.style.getPropertyPriority(prop));
         });
@@ -103,27 +74,9 @@
     });
   }
 
-  function patchInlineBackgrounds(root){
-    const scope=root&&root.querySelectorAll?root:document;
-    const patch=function(el){
-      if(!el||!el.getAttribute)return;
-      const style=el.getAttribute('style');
-      if(style&&/url\(/i.test(style)){
-        const next=rewriteUrls(style);
-        if(next!==style)el.setAttribute('style',next);
-      }
-      ['data-bg','data-bg-hidpi','data-background-image','data-dce-background-image-url','data-dce-background-overlay-image-url'].forEach(function(attr){
-        const value=el.getAttribute(attr);
-        if(!value)return;
-        const branded=brandAsset(value);
-        if(branded)el.setAttribute(attr,branded);
-      });
-    };
-    if(root&&root.nodeType===1)patch(root);
-    scope.querySelectorAll&&scope.querySelectorAll('[style],[data-bg],[data-bg-hidpi],[data-background-image],[data-dce-background-image-url],[data-dce-background-overlay-image-url]').forEach(patch);
-  }
-
-  /* Source critical CSS hides backgrounds until Elementor marks parent containers loaded. */
+  /* The source critical CSS intentionally hides backgrounds on .e-con.e-parent until Elementor's lazy observer adds e-lazyloaded.
+     In the clone that observer may be delayed or unavailable, leaving valid backgrounds permanently hidden by !important.
+     Marking only Elementor parent containers as loaded restores the source background rules; it does not touch transforms or motion. */
   function releaseElementorBackgrounds(root){
     const scope=root&&root.querySelectorAll?root:document;
     if(root&&root.matches&&root.matches('.e-con.e-parent')&&!root.classList.contains('e-lazyloaded'))root.classList.add('e-lazyloaded');
@@ -135,7 +88,6 @@
   function sweep(root){
     const scope=root&&root.querySelectorAll?root:document;
     releaseElementorBackgrounds(root||document);
-    patchInlineBackgrounds(root||document);
     if(root&&root.tagName==='STYLE')patchStyleElement(root);
     scope.querySelectorAll&&scope.querySelectorAll('style').forEach(patchStyleElement);
     patchStylesheets();
@@ -160,8 +112,7 @@
         record.addedNodes.forEach(function(node){
           if(node.nodeType!==1)return;
           releaseElementorBackgrounds(node);
-          patchInlineBackgrounds(node);
-          if(node.tagName==='STYLE'||node.tagName==='LINK'||node.matches?.('.e-con.e-parent')||node.querySelector?.('style,link[rel="stylesheet"],.e-con.e-parent,[data-bg],[data-background-image]'))needed=true;
+          if(node.tagName==='STYLE'||node.tagName==='LINK'||node.matches?.('.e-con.e-parent')||node.querySelector?.('style,link[rel="stylesheet"],.e-con.e-parent'))needed=true;
         });
       });
       if(needed)queueSweep(document);
