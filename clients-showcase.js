@@ -7,14 +7,27 @@
   const SECTION_ID='17b40cf';
   const GRID_ID='49884ea';
   const IS_EN=/^\/en(?:\/|$)/i.test(location.pathname||'/');
-  const CLOUD='https://res.cloudinary.com/dxvjqrb9l/image/upload/f_auto,q_auto/';
-  const LOGOS=Array.from({length:17},(_,i)=>{
-    const id='client-'+String(i+1).padStart(2,'0');
-    return {
-      primary:CLOUD+'elnashargroup/clients/'+id,
-      fallback:CLOUD+id
-    };
-  });
+  const ASSET_BASE='/assets/clients/';
+  const LOGOS=[
+    {file:'client-01.webp',name:'شعار عميل 1'},
+    {file:'client-02.avif',name:'شعار عميل 2'},
+    {file:'client-03.png',name:'شعار عميل 3'},
+    {file:'client-04.png',name:'شعار عميل 4'},
+    {file:'client-05.png',name:'شعار عميل 5'},
+    {file:'client-06.webp',name:'شعار عميل 6'},
+    {file:'client-07.jfif',name:'شعار عميل 7'},
+    {file:'client-08.jfif',name:'شعار عميل 8'},
+    {file:'client-09.jfif',name:'شعار عميل 9'},
+    {file:'client-10.png',name:'معلم مطابخ'},
+    {file:'client-11.png',name:'مؤسسة العازل الحديث'},
+    {file:'client-12.png',name:'روائع الجي ار سي'},
+    {file:'client-13.png',name:'فني كهرباء دبي'},
+    {file:'client-14.png',name:'نجار دبي'},
+    {file:'client-15.png',name:'صيانة جدة'},
+    {file:'client-16.png',name:'شعار تعقيب'},
+    {file:'client-17.png',name:'حداد كريتال جدة'},
+    {file:'client-18.png',name:'سلام 5G'}
+  ].map(item=>({primary:ASSET_BASE+item.file,fallback:ASSET_BASE+item.file,name:item.name}));
 
   function addStyles(){
     if(document.getElementById('nashar-client-showcase-v2'))return;
