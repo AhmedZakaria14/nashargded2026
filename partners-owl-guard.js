@@ -140,12 +140,12 @@
   (document.head||document.documentElement).appendChild(s);
 })();
 
-/* Homepage-only business content updates: portfolio, phone and WhatsApp request form. */
+/* Homepage business/content updates: portfolio, contacts, Learn With Us thumbnails, off-canvas logo and WhatsApp form. */
 (function(){
-  if(window.__nasharHomepageBusinessLoader)return;
-  window.__nasharHomepageBusinessLoader=true;
+  if(window.__nasharHomepageBusinessLoaderV2)return;
+  window.__nasharHomepageBusinessLoaderV2=true;
   const s=document.createElement('script');
-  s.src='/homepage-business-fix.js?v=1';
+  s.src='/homepage-business-fix.js?v=2';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
