@@ -119,3 +119,13 @@
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
+
+/* Recover image URLs embedded in Elementor/theme CSS. Isolated from Owl and motion styles. */
+(function(){
+  if(window.__nasharMediaCssHardeningLoader)return;
+  window.__nasharMediaCssHardeningLoader=true;
+  const s=document.createElement('script');
+  s.src='/media-css-hardening.js?v=1';
+  s.async=false;
+  (document.head||document.documentElement).appendChild(s);
+})();
