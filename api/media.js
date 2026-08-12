@@ -1,5 +1,21 @@
 const ALLOWED_HOSTS=new Set(['adselams.com','www.adselams.com']);
 const IMAGE_EXT=/\.(?:avif|bmp|gif|ico|jpe?g|png|svg|webp)(?:$|\?)/i;
+const SAFE_LOCAL_PATH=/^(?:wp-content\/uploads\/|wp-content\/themes\/[^/]+\/assets\/images\/|wp-content\/plugins\/[^/]+\/(?:assets\/images|images)\/)/i;
+
+function first(value){
+  return Array.isArray(value)?value[0]:value;
+}
+
+function sourceFromRequest(req){
+  const explicit=first(req.query.u);
+  if(explicit)return explicit;
+
+  let path=first(req.query.path)||'';
+  try{path=decodeURIComponent(path)}catch{}
+  path=String(path).replace(/^\/+/, '').replace(/\\/g,'/');
+  if(!path||path.includes('..')||!SAFE_LOCAL_PATH.test(path))return '';
+  return 'https://adselams.com/'+path;
+}
 
 function candidateUrls(raw){
   const out=[];
@@ -15,18 +31,31 @@ function candidateUrls(raw){
   noQuery.search='';
   add(noQuery.toString());
 
+  /* LiteSpeed commonly appends .webp to the real extension (image.png.webp). */
   for(const base of [...out]){
     if(/\.webp$/i.test(base))add(base.replace(/\.webp$/i,''));
     else if(/\.webp(?:\?)/i.test(base))add(base.replace(/\.webp(?=\?)/i,''));
   }
 
+  /* If a generated WordPress size was deleted, recover the original upload. */
   for(const base of [...out]){
     try{
       const x=new URL(base);
-      const restored=x.pathname.replace(/-\d+x\d+(?=\.(?:avif|gif|jpe?g|png|webp)$)/i,'');
+      const restored=x.pathname.replace(/-\d+x\d+(?=\.(?:avif|gif|jpe?g|png|svg|webp)$)/i,'');
       if(restored!==x.pathname){x.pathname=restored;add(x.toString())}
     }catch{}
   }
+
+  /* Repeat the two normalizations once so image-300x200.png.webp can become image.png. */
+  for(const base of [...out]){
+    if(/\.webp$/i.test(base))add(base.replace(/\.webp$/i,''));
+    try{
+      const x=new URL(base);
+      const restored=x.pathname.replace(/-\d+x\d+(?=\.(?:avif|gif|jpe?g|png|svg|webp)$)/i,'');
+      if(restored!==x.pathname){x.pathname=restored;add(x.toString())}
+    }catch{}
+  }
+
   return out;
 }
 
@@ -35,10 +64,11 @@ async function fetchCandidate(url,signal){
     redirect:'follow',
     signal,
     headers:{
-      'User-Agent':'Mozilla/5.0 (compatible; ELNASHARGROUP-MediaProxy/2.0; +https://nashargded2026.vercel.app)',
+      'User-Agent':'Mozilla/5.0 (compatible; ELNASHARGROUP-MediaProxy/3.0; +https://nashargded2026.vercel.app)',
       'Referer':'https://adselams.com/',
       'Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-      'Accept-Language':'en-US,en;q=0.9,ar;q=0.8'
+      'Accept-Language':'en-US,en;q=0.9,ar;q=0.8',
+      'Cache-Control':'no-cache'
     }
   });
   if(!response.ok)return null;
@@ -46,7 +76,12 @@ async function fetchCandidate(url,signal){
   if(!(type.startsWith('image/')||(!type&&IMAGE_EXT.test(url))))return null;
   const body=Buffer.from(await response.arrayBuffer());
   if(!body.length)return null;
-  return {body,type:type||'application/octet-stream',etag:response.headers.get('etag')||''};
+  return {
+    body,
+    type:type||'application/octet-stream',
+    etag:response.headers.get('etag')||'',
+    modified:response.headers.get('last-modified')||''
+  };
 }
 
 module.exports=async function handler(req,res){
@@ -55,13 +90,13 @@ module.exports=async function handler(req,res){
     return res.status(405).end('Method Not Allowed');
   }
 
-  const raw=Array.isArray(req.query.u)?req.query.u[0]:req.query.u;
+  const raw=sourceFromRequest(req);
   const candidates=candidateUrls(raw||'');
   if(!candidates.length)return res.status(400).end('Invalid media URL');
 
   for(const url of candidates){
     const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),12000);
+    const timer=setTimeout(()=>controller.abort(),15000);
     try{
       const result=await fetchCandidate(url,controller.signal);
       if(!result)continue;
@@ -73,10 +108,11 @@ module.exports=async function handler(req,res){
       res.setHeader('X-Content-Type-Options','nosniff');
       res.setHeader('Cross-Origin-Resource-Policy','cross-origin');
       if(result.etag)res.setHeader('ETag',result.etag);
+      if(result.modified)res.setHeader('Last-Modified',result.modified);
       if(req.method==='HEAD')return res.end();
       return res.end(result.body);
     }catch(error){
-      // Continue to the next safe WordPress variant on timeout/network/404-like failures.
+      /* Continue through safe WordPress variants on timeout/network failures. */
     }finally{
       clearTimeout(timer);
     }
