@@ -155,7 +155,7 @@
   if(window.__nasharLegacyLinkFirewallLoader)return;
   window.__nasharLegacyLinkFirewallLoader=true;
   const s=document.createElement('script');
-  s.src='/legacy-link-firewall.js?v=1';
+  s.src='/legacy-link-firewall.js?v=2';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
