@@ -1,14 +1,15 @@
-/* النشار جروب — legacy Adsela link firewall v1.
+/* النشار جروب — legacy Adsela link firewall v2.
    Keeps cloned internal paths on this site and blocks all old Adsela/social outbound destinations. */
 (function(){
   'use strict';
-  if(window.__nasharLegacyLinkFirewallV1)return;
-  window.__nasharLegacyLinkFirewallV1=true;
+  if(window.__nasharLegacyLinkFirewallV2)return;
+  window.__nasharLegacyLinkFirewallV2=true;
 
   const IS_EN=/^\/en(?:\/|$)/i.test(location.pathname||'/');
   const MESSAGE=IS_EN?'This page is not available yet':'الصفحة غير موجودة بعد';
   const OLD_EMAIL='info@adselams.com';
   const NEW_EMAIL='info@elnashargroup.com';
+  const OLD_SITE=/^https?:\/\/(?:www\.)?adselams\.com(?:\/|$)/i;
 
   const SOCIAL_HOSTS=new Set([
     'facebook.com','www.facebook.com','instagram.com','www.instagram.com',
@@ -29,6 +30,10 @@
 
   function isCopiedSocialSlot(a){
     return !!a.closest('.offcanvas__social,.elementor-social-icons-wrapper,footer .elementor-widget-social-icons,.footer__social');
+  }
+
+  function localizeOldSite(raw){
+    try{const u=new URL(raw);return (u.pathname||'/')+u.search+u.hash}catch(e){return null}
   }
 
   function showUnavailable(){
@@ -73,35 +78,74 @@
       return;
     }
 
-    if(/^https?:\/\/(?:www\.)?adselams\.com(?:\/|$)/i.test(href)){
-      try{
-        const u=new URL(href);
-        a.setAttribute('href',(u.pathname||'/')+u.search+u.hash);
+    if(OLD_SITE.test(href)){
+      const local=localizeOldSite(href);
+      if(local){
+        a.setAttribute('href',local);
         a.removeAttribute('target');
         a.removeAttribute('rel');
         a.removeAttribute('data-scroll');
         a.removeAttribute('data-options');
-      }catch(e){disableAnchor(a)}
+      }else disableAnchor(a);
       return;
     }
 
-    if(isAdselaSocialUrl(href)||isCopiedSocialSlot(a)){
-      /* Until Nashar-owned social URLs are configured, copied social slots never leave the site. */
-      disableAnchor(a);
+    if(isAdselaSocialUrl(href)||isCopiedSocialSlot(a))disableAnchor(a);
+  }
+
+  function sanitizeForm(form){
+    const action=form.getAttribute('action')||'';
+    if(OLD_SITE.test(action)){
+      const local=localizeOldSite(action);
+      if(local)form.setAttribute('action',local);
+      else{form.setAttribute('action','#');form.dataset.nasharUnavailable='1'}
     }
+  }
+
+  function sanitizeDataUrl(el,attr){
+    const raw=el.getAttribute(attr)||'';
+    if(!raw)return;
+    if(OLD_SITE.test(raw)){
+      const local=localizeOldSite(raw);
+      if(local)el.setAttribute(attr,local);else el.removeAttribute(attr);
+    }else if(isAdselaSocialUrl(raw))el.removeAttribute(attr);
+  }
+
+  function sanitizeHead(){
+    if(!document.head)return;
+    document.head.querySelectorAll('base[href]').forEach(b=>{if(/adselams\.com/i.test(b.getAttribute('href')||''))b.remove()});
+    document.head.querySelectorAll('link[href]').forEach(link=>{
+      const href=link.getAttribute('href')||'';
+      if(!OLD_SITE.test(href))return;
+      const rel=(link.getAttribute('rel')||'').toLowerCase();
+      if(rel.includes('stylesheet')||rel.includes('preload')||rel.includes('icon')){
+        try{const u=new URL(href);link.setAttribute('href','/origin/'+u.pathname.replace(/^\//,'')+u.search)}catch(e){link.remove()}
+        return;
+      }
+      if(rel.includes('alternate')&&link.hasAttribute('hreflang')){
+        const lang=(link.getAttribute('hreflang')||'').toLowerCase();
+        link.setAttribute('href',lang==='en'?location.origin+'/en/':location.origin+'/');
+        return;
+      }
+      /* Old RSS, oEmbed and other discovery links must not advertise Adsela endpoints. */
+      link.remove();
+    });
+    document.head.querySelectorAll('meta[content]').forEach(meta=>{
+      const c=meta.getAttribute('content')||'';
+      if(/facebook\.com\/adselams|instagram\.com\/adselams|twitter\.com\/adselams|x\.com\/.*adselams|linkedin\.com\/company\/67474127|youtube\.com\/channel\/UC1FkRVDblKE-pA64zOrEFIg/i.test(c))meta.remove();
+    });
   }
 
   function sanitizeRoot(root){
     if(!root)return;
     const scope=root.querySelectorAll?root:document;
     scope.querySelectorAll('a[href]').forEach(sanitizeAnchor);
-    scope.querySelectorAll('form[action]').forEach(form=>{
-      const action=form.getAttribute('action')||'';
-      if(/^https?:\/\/(?:www\.)?adselams\.com(?:\/|$)/i.test(action)){
-        form.setAttribute('action','#');
-        form.dataset.nasharUnavailable='1';
-      }
+    scope.querySelectorAll('form[action]').forEach(sanitizeForm);
+    scope.querySelectorAll('[data-url],[data-href]').forEach(el=>{
+      if(el.hasAttribute('data-url'))sanitizeDataUrl(el,'data-url');
+      if(el.hasAttribute('data-href'))sanitizeDataUrl(el,'data-href');
     });
+    sanitizeHead();
   }
 
   document.addEventListener('click',function(e){
@@ -111,9 +155,10 @@
     if(a.dataset.nasharUnavailable==='1'||isAdselaSocialUrl(href)||isCopiedSocialSlot(a)){
       e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();showUnavailable();return;
     }
-    if(/^https?:\/\/(?:www\.)?adselams\.com(?:\/|$)/i.test(href)){
+    if(OLD_SITE.test(href)){
       e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
-      try{const u=new URL(href);location.href=(u.pathname||'/')+u.search+u.hash}catch(err){showUnavailable()}
+      const local=localizeOldSite(href);
+      if(local)location.href=local;else showUnavailable();
     }
   },true);
 
