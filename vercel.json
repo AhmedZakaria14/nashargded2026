@@ -137,9 +137,6 @@
     { "source": "/wp-content/uploads/:year/:month/cropped-fav-icon-1-32x32.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
     { "source": "/wp-content/uploads/:year/:month/cropped-fav-icon-1-192x192.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
 
-    { "source": "/wp-content/themes/:theme/assets/images/shape/111222.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
-    { "source": "/wp-content/themes/:theme/assets/images/shape/111222.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
-
     { "source": "/origin/wp-content/uploads/:year/:month/Adsela-new-logo2.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
     { "source": "/origin/wp-content/uploads/:year/:month/Adsela-new-logo2.png.webp", "destination": "/assets/elnashargroup-logo-v3.svg" },
     { "source": "/origin/wp-content/uploads/:year/:month/adsela-new-logo.png", "destination": "/assets/elnashargroup-logo-v3.svg" },
@@ -154,9 +151,6 @@
     { "source": "/origin/wp-content/uploads/:year/:month/logo-adsela-half-right.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
     { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-32x32.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
     { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-192x192.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
-
-    { "source": "/origin/wp-content/themes/:theme/assets/images/shape/111222.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
-    { "source": "/origin/wp-content/themes/:theme/assets/images/shape/111222.png.webp", "destination": "/assets/elnashargroup-icon-v3.svg" },
 
     { "source": "/origin/wp-content/uploads/:path*", "destination": "/api/media?path=wp-content/uploads/:path*" },
     { "source": "/origin/wp-content/themes/:theme/assets/images/:path*", "destination": "/api/media?path=wp-content/themes/:theme/assets/images/:path*" },
