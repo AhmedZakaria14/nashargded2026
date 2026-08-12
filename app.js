@@ -12,7 +12,8 @@ const services=[
  {path:'/influencers-marketing/',num:'09',title:'التسويق عبر المؤثرين',short:'اختيار مؤثرين مناسبين للعلامة، إدارة التعاون وقياس الأثر بعيدًا عن الأرقام السطحية.',tag:'CREATORS',lead:'التأثير الحقيقي يبدأ من التطابق، لا من عدد المتابعين.',intro:'نحدد الجمهور والرسالة، نرشح المؤثرين حسب الجودة والملاءمة، ندير التفاوض والمحتوى والتتبع لنربط الانتشار بنتيجة تجارية.',features:['Creator Research','Audience Fit','Campaign Strategy','Negotiation','Briefing','Content Review','Tracking Links','Performance Report']}
 ];
 const works=[
- ['NAWA','هوية وإطلاق رقمي','#0b1711','#b9ff56','#2c7d56'],['SAND','تجارة إلكترونية','#1a1633','#ffb95f','#8058ff'],['KIN','حملة أداء','#061b28','#54d7ff','#ff6a91'],['RISE','منصة رقمية','#2b120d','#ff885f','#ffe6c5'],['ORBIT','منتج تقني','#151515','#e8ff63','#7a6cff'],['HABIT','استراتيجية محتوى','#172112','#8fe66d','#e8d8a8']
+ ['مندوب زين 5G','موكاب موقع','/assets/portfolio/elnashargroup-mandoubzain-mockup.png'],
+ ['مشروع 02','هوية رقمية'],['مشروع 03','تجربة محتوى'],['مشروع 04','منصة إلكترونية'],['مشروع 05','حملة أداء'],['مشروع 06','استراتيجية علامة']
 ];
 const posts=[
  ['استراتيجية','كيف تبني منظومة تسويق لا تعتمد على قناة واحدة؟','الانتقال من حملات متفرقة إلى نظام نمو يربط المحتوى والبحث والإعلانات والتحويل.'],
@@ -22,7 +23,7 @@ const posts=[
  ['براند','الهوية ليست شعارًا: كيف تبني نظامًا بصريًا قابلًا للتوسع؟','الفرق بين تصميم جميل وهوية تعمل عبر عشرات نقاط الاتصال.'],
  ['محتوى','كيف تحول خطة المحتوى إلى محرك طلب؟','ربط الموضوعات بنية العميل ومراحل القرار بدل النشر لمجرد الاستمرارية.']
 ];
-function workCards(){return works.map((w,i)=>`<article class="work-card reveal" data-cat="${i%3===0?'brand':i%3===1?'web':'performance'}"><div class="work-art" style="--c:${w[2]};--a:${w[3]};--b:${w[4]}"></div><div class="work-info"><div><h3>${w[0]}</h3><span>${w[1]} · 2026</span></div><b>↗</b></div></article>`).join('')}
+function workCards(){return works.map((w,i)=>{const featured=i===0;const artStyle=featured?`style="--work-image:url('${w[2]}')"`:'';return `<article class="work-card reveal${featured?' work-card-featured':''}" data-cat="${i%3===0?'brand':i%3===1?'web':'performance'}" aria-label="${w[0]}"><div class="work-art" ${artStyle} aria-hidden="true"></div><div class="work-info"><div><h3>${w[0]}</h3><span>${w[1]} · 2026</span></div><b aria-hidden="true">↗</b></div></article>`}).join('')}
 function serviceRows(){return services.map(s=>`<a class="service-row reveal" href="${s.path}" data-link><span class="num">${s.num}</span><h3>${s.title}</h3><p>${s.short}</p><span class="arrow">↗</span><i class="hover-tag"></i></a>`).join('')}
 function marquee(){let t='STRATEGY ✦ PERFORMANCE ✦ SOCIAL ✦ SEO ✦ WEB ✦ BRAND ✦ E-COMMERCE ✦ MOTION ✦ ';return `<div class="marquee"><div class="marquee-track"><i>${t}</i><i>${t}</i><i>${t}</i><i>${t}</i></div></div>`}
 function home(){return `
