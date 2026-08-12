@@ -135,7 +135,7 @@
   if(window.__nasharClientShowcaseLoader)return;
   window.__nasharClientShowcaseLoader=true;
   const s=document.createElement('script');
-  s.src='/clients-showcase.js?v=1';
+  s.src='/clients-showcase.js?v=2';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
