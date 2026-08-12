@@ -152,6 +152,11 @@
     { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-32x32.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
     { "source": "/origin/wp-content/uploads/:year/:month/cropped-fav-icon-1-192x192.png", "destination": "/assets/elnashargroup-icon-v3.svg" },
 
+    { "source": "/origin/wp-content/uploads/:path*", "destination": "/api/media?path=wp-content/uploads/:path*" },
+    { "source": "/origin/wp-content/themes/:theme/assets/images/:path*", "destination": "/api/media?path=wp-content/themes/:theme/assets/images/:path*" },
+    { "source": "/origin/wp-content/plugins/:plugin/assets/images/:path*", "destination": "/api/media?path=wp-content/plugins/:plugin/assets/images/:path*" },
+    { "source": "/origin/wp-content/plugins/:plugin/images/:path*", "destination": "/api/media?path=wp-content/plugins/:plugin/images/:path*" },
+
     { "source": "/origin/en", "destination": "/api/en-source" },
     { "source": "/origin/en/", "destination": "/api/en-source" },
     { "source": "/origin/:path*", "destination": "https://adselams.com/:path*" },
@@ -177,9 +182,13 @@
     { "source": "/en/", "destination": "/index.html" },
     { "source": "/en/:path*", "destination": "/index.html" },
 
+    { "source": "/wp-content/themes/:theme/assets/images/:path*", "destination": "/api/media?path=wp-content/themes/:theme/assets/images/:path*" },
+    { "source": "/wp-content/plugins/:plugin/assets/images/:path*", "destination": "/api/media?path=wp-content/plugins/:plugin/assets/images/:path*" },
+    { "source": "/wp-content/plugins/:plugin/images/:path*", "destination": "/api/media?path=wp-content/plugins/:plugin/images/:path*" },
+    { "source": "/wp-content/uploads/:path*", "destination": "/api/media?path=wp-content/uploads/:path*" },
+
     { "source": "/wp-content/plugins/:path*", "destination": "https://adselams.com/wp-content/plugins/:path*" },
     { "source": "/wp-content/themes/:path*", "destination": "https://adselams.com/wp-content/themes/:path*" },
-    { "source": "/wp-content/uploads/:path*", "destination": "https://adselams.com/wp-content/uploads/:path*" },
     { "source": "/wp-content/cache/:path*", "destination": "https://adselams.com/wp-content/cache/:path*" },
     { "source": "/wp-includes/:path*", "destination": "https://adselams.com/wp-includes/:path*" },
     { "source": "/fonts.gstatic.com/:path*", "destination": "https://fonts.gstatic.com/:path*" }
