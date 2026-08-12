@@ -149,3 +149,13 @@
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
+
+/* Site-wide link authority: never allow copied Adsela or their social destinations to leave Nashar. */
+(function(){
+  if(window.__nasharLegacyLinkFirewallLoader)return;
+  window.__nasharLegacyLinkFirewallLoader=true;
+  const s=document.createElement('script');
+  s.src='/legacy-link-firewall.js?v=1';
+  s.async=false;
+  (document.head||document.documentElement).appendChild(s);
+})();
