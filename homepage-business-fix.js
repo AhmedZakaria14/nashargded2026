@@ -1,22 +1,28 @@
-/* النشار جروب — isolated homepage business updates v1.
-   Scope: portfolio, off-canvas phone, and the former PDF lead section only. */
+/* النشار جروب — isolated homepage business updates v2.
+   Scope: portfolio, off-canvas/footer contacts, Learn With Us thumbnails, menu logo, and the former PDF lead section only. */
 (function(){
   'use strict';
-  if(window.__nasharHomepageBusinessFixV1)return;
-  window.__nasharHomepageBusinessFixV1=true;
+  if(window.__nasharHomepageBusinessFixV2)return;
+  window.__nasharHomepageBusinessFixV2=true;
 
   const PHONE_DISPLAY='+20 10 10742430';
   const PHONE_TEL='+201010742430';
   const WHATSAPP='201010742430';
+  const FOOTER_EMAIL='info@elnashargroup.com';
   const PORTFOLIO_IMAGE='/assets/portfolio/elnashargroup-mandoubzain-mockup.png';
   const PDF_SECTION_ID='c0be706';
+  const LEARN_TITLES=new Set([
+    'لوحة مؤشرات الأداء: كيف تتابع جميع بيانات التسويق في مكان واحد؟',
+    'ما هو التسويق عن طريق محركات البحث؟',
+    '15 فكرة من افكار تسويقية لجذب العملاء الجدد'
+  ]);
   let stylesReady=false;
 
   function addStyles(){
-    if(stylesReady||document.getElementById('nashar-home-business-v1'))return;
+    if(stylesReady||document.getElementById('nashar-home-business-v2'))return;
     stylesReady=true;
     const style=document.createElement('style');
-    style.id='nashar-home-business-v1';
+    style.id='nashar-home-business-v2';
     style.textContent=`
       /* Portfolio: keep the source composition but make the single retained project fill its available area. */
       .portfolio__list-1[data-nashar-single-work="1"] .portfolio__item{margin-left:auto!important;margin-right:auto!important}
@@ -24,6 +30,12 @@
       .portfolio__list-1[data-nashar-single-work="1"] .portfolio__item img[data-nashar-featured-work="1"]{
         display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;object-fit:contain!important;object-position:center!important
       }
+
+      /* Learn With Us: selected posts must never reveal the legacy Adsela thumbnails. */
+      .blog__item-2[data-nashar-hide-thumb="1"] .blog__img-wrapper{display:none!important}
+
+      /* The dotted/off-canvas menu must not show the legacy Adsela logo. */
+      .offcanvas__area .offcanvas__logo{display:none!important}
 
       /* Service-request replacement for the old PDF section. */
       [data-id="${PDF_SECTION_ID}"].nashar-request-section{background:#0b0b0b!important;color:#fff!important;padding:72px 0!important;overflow:hidden!important}
@@ -96,21 +108,23 @@
     return true;
   }
 
+  function setContactAnchorText(a,text){
+    const textTarget=a.querySelector('.elementor-icon-list-text');
+    if(textTarget){textTarget.textContent=text;return}
+    if(!a.querySelector('svg,i,img')){a.textContent=text;return}
+    const textNodes=[];
+    const walker=document.createTreeWalker(a,NodeFilter.SHOW_TEXT);
+    let n;while((n=walker.nextNode()))if((n.nodeValue||'').trim())textNodes.push(n);
+    if(textNodes.length)textNodes[textNodes.length-1].nodeValue=text;
+  }
+
   function patchMenuPhone(){
     const scopes=document.querySelectorAll('.offcanvas__area,.offcanvas__contact');
     if(!scopes.length)return false;
     scopes.forEach(scope=>{
       scope.querySelectorAll('a[href^="tel:"]').forEach(a=>{
         a.setAttribute('href','tel:'+PHONE_TEL);
-        const textTarget=a.querySelector('.elementor-icon-list-text');
-        if(textTarget)textTarget.textContent=PHONE_DISPLAY;
-        else if(!a.querySelector('svg,i,img'))a.textContent=PHONE_DISPLAY;
-        else {
-          const textNodes=[];
-          const walker=document.createTreeWalker(a,NodeFilter.SHOW_TEXT);
-          let n;while((n=walker.nextNode()))if((n.nodeValue||'').trim())textNodes.push(n);
-          if(textNodes.length)textNodes[textNodes.length-1].nodeValue=PHONE_DISPLAY;
-        }
+        setContactAnchorText(a,PHONE_DISPLAY);
       });
       scope.querySelectorAll('.offcanvas__contact li').forEach(li=>{
         if(/00966581471796|966581471796\+?|\+?966\s*58\s*147\s*1796/.test(li.textContent||'')){
@@ -123,6 +137,46 @@
       });
     });
     return true;
+  }
+
+  function hideSelectedLearnThumbnails(){
+    let changed=false;
+    document.querySelectorAll('.blog__area-2 .blog__item-2').forEach(card=>{
+      const titleLink=card.querySelector('a.blog__title-2');
+      const title=(titleLink?.textContent||'').replace(/\s+/g,' ').trim();
+      if(!LEARN_TITLES.has(title))return;
+      card.dataset.nasharHideThumb='1';
+      const wrapper=card.querySelector('.blog__img-wrapper');
+      if(wrapper){wrapper.remove();changed=true}
+    });
+    return changed;
+  }
+
+  function patchFooterContacts(){
+    const footer=document.querySelector('footer');
+    if(!footer)return false;
+
+    footer.querySelectorAll('a[href^="mailto:"]').forEach(a=>{
+      a.setAttribute('href','mailto:'+FOOTER_EMAIL);
+      setContactAnchorText(a,FOOTER_EMAIL);
+    });
+    footer.querySelectorAll('a[href^="tel:"]').forEach(a=>{
+      a.setAttribute('href','tel:'+PHONE_TEL);
+      setContactAnchorText(a,PHONE_DISPLAY);
+    });
+
+    footer.querySelectorAll('.elementor-icon-list-text').forEach(span=>{
+      const text=(span.textContent||'').trim();
+      if(/info@(adsela|adselams)\.com/i.test(text))span.textContent=FOOTER_EMAIL;
+      if(/00966581471796|966581471796\+?|\+?966\s*58\s*147\s*1796/.test(text))span.textContent=PHONE_DISPLAY;
+    });
+    return true;
+  }
+
+  function removeOffcanvasLogo(){
+    const logos=document.querySelectorAll('.offcanvas__area .offcanvas__logo');
+    logos.forEach(logo=>logo.remove());
+    return logos.length>0;
   }
 
   function serviceOptions(){
@@ -222,6 +276,9 @@
     addStyles();
     patchPortfolio();
     patchMenuPhone();
+    hideSelectedLearnThumbnails();
+    patchFooterContacts();
+    removeOffcanvasLogo();
     replacePdfSection();
   }
 
