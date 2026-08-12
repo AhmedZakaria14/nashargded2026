@@ -129,3 +129,13 @@
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
+
+/* Replace only the homepage client-brand grid with the approved uploaded client logos. */
+(function(){
+  if(window.__nasharClientShowcaseLoader)return;
+  window.__nasharClientShowcaseLoader=true;
+  const s=document.createElement('script');
+  s.src='/clients-showcase.js?v=1';
+  s.async=false;
+  (document.head||document.documentElement).appendChild(s);
+})();
