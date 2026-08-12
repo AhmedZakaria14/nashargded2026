@@ -1,8 +1,8 @@
-/* النشار جروب — lightweight bilingual brand/language authority, isolated from motion/scroll updates. */
+/* النشار جروب — bilingual brand authority + permanent legacy-logo purge, isolated from motion/scroll updates. */
 (function(){
   'use strict';
-  if(window.__nasharBrandStabilityActive)return;
-  window.__nasharBrandStabilityActive=true;
+  if(window.__nasharBrandStabilityActiveV2)return;
+  window.__nasharBrandStabilityActiveV2=true;
   window.__nasharBrandStabilityRequested=true;
 
   const IS_EN=/^\/en(?:\/|$)/i.test(location.pathname||'/');
@@ -15,9 +15,25 @@
   const SITE=location.origin;
   const OLD_TEXT=/(Adsela\s+Marketing\s+Solutions|Adsela\s+Digital\s+Marketing\s+Solutions|Adsela|ADSELA|أدسيلا|ادسيلا|Nashar\s+Digital|نشار\s+ديجيتال)/gi;
   const OLD_DOMAIN=/(?:www\.)?(?:adselams\.com|nashar\.digital)/gi;
-  const OLD_LOGO=/(adsela(?:[-_ ]?new)?[-_ ]?logo\d*|adsela[-_ ]?logo|logo[-_ ]?adsela|adsela-icon-footer\d*|cropped-fav-icon|logo-png-white-01)/i;
-  const SKIP=new Set(['SCRIPT','STYLE','NOSCRIPT','CODE','PRE','TEXTAREA']);
+  const OLD_LOGO=/(?:adsela|adselams)[^?#/]*(?:logo|icon|fav)|(?:logo|icon|fav)[^?#/]*(?:adsela|adsel)|logo[-_ ]?adsela[-_ ]?half|adsela[-_ ]?icon[-_ ]?footer|cropped[-_ ]?fav[-_ ]?icon|logo[-_ ]?png[-_ ]?white[-_ ]?01/i;
+  const SKIP=new Set(['SCRIPT','NOSCRIPT','CODE','PRE','TEXTAREA']);
   let observer=null;
+  let cssScheduled=false;
+
+  function decodeLoose(v){
+    let out=String(v||'');
+    for(let i=0;i<2;i++){
+      try{const next=decodeURIComponent(out);if(next===out)break;out=next}catch(e){break}
+    }
+    return out;
+  }
+
+  function oldLogoTarget(raw,forceFull){
+    const value=decodeLoose(raw);
+    if(!OLD_LOGO.test(value))return '';
+    if(forceFull)return LOGO;
+    return /icon|fav|half|footer/i.test(value)?ICON:LOGO;
+  }
 
   function textBrand(v){
     if(!v||typeof v!=='string')return v;
@@ -42,21 +58,106 @@
     const next=textBrand(raw);if(next!==raw)node.nodeValue=next;
   }
 
+  function brandSlot(el){
+    return !!el?.closest?.('.header__logo-2,.offcanvas__logo,.footer__logo,.footer__logo-2,.elnashar-brand,header .logo,footer .logo,.site-header .brand');
+  }
+
   function patchImg(img){
     if(!img||img.tagName!=='IMG')return;
-    const raw=[img.getAttribute('src'),img.getAttribute('data-src'),img.getAttribute('srcset'),img.getAttribute('data-srcset'),img.getAttribute('alt')].filter(Boolean).join(' ');
-    const slot=img.closest('.header__logo-2,.offcanvas__logo,.footer__logo,.footer__logo-2,.elnashar-brand,header .logo,footer .logo');
-    if(!slot&&!OLD_LOGO.test(raw)&&!/elnashargroup-(?:logo|icon)-v3\.svg/i.test(raw))return;
-    const icon=!slot&&/(icon-footer|cropped-fav|logo-adsela-half|elnashargroup-icon)/i.test(raw);
-    const target=icon?ICON:LOGO;
+    const raw=['src','data-src','data-lazy-src','data-original','data-lazyload','srcset','data-srcset','data-lazy-srcset','alt','title']
+      .map(a=>img.getAttribute(a)).filter(Boolean).join(' ');
+    const slot=brandSlot(img);
+    const oldTarget=oldLogoTarget(raw,slot);
+    if(!slot&&!oldTarget&&!/elnashargroup-(?:logo|icon)-v3\.svg/i.test(raw))return;
+    const target=slot?LOGO:(oldTarget||(/elnashargroup-icon/i.test(raw)?ICON:LOGO));
     if(img.getAttribute('src')!==target)img.setAttribute('src',target);
     if(img.getAttribute('alt')!==BRAND)img.setAttribute('alt',BRAND);
-    ['srcset','data-src','data-srcset','data-lazy-src','data-lazy-srcset','data-original','data-sizes'].forEach(a=>img.removeAttribute(a));
+    ['srcset','data-src','data-srcset','data-lazy-src','data-lazy-srcset','data-original','data-lazyload','data-sizes'].forEach(a=>img.removeAttribute(a));
+    img.dataset.elnasharBrand=target===ICON?'icon':'logo';
     img.style.setProperty('visibility','visible','important');
     img.style.setProperty('opacity','1','important');
     img.style.setProperty('object-fit','contain','important');
     img.style.setProperty('object-position','center','important');
     img.style.setProperty('height','auto','important');
+  }
+
+  function patchSource(source){
+    if(!source||source.tagName!=='SOURCE')return;
+    const raw=['src','srcset','data-src','data-srcset','data-lazy-src','data-lazy-srcset'].map(a=>source.getAttribute(a)).filter(Boolean).join(' ');
+    const slot=brandSlot(source);
+    const target=slot?LOGO:oldLogoTarget(raw,false);
+    if(!target)return;
+    source.setAttribute('srcset',target);
+    ['src','data-src','data-srcset','data-lazy-src','data-lazy-srcset'].forEach(a=>source.removeAttribute(a));
+  }
+
+  function patchSvgImage(el){
+    if(!el||String(el.tagName).toLowerCase()!=='image')return;
+    const href=el.getAttribute('href')||el.getAttribute('xlink:href')||'';
+    const target=oldLogoTarget(href,brandSlot(el));
+    if(!target)return;
+    el.setAttribute('href',target);
+    el.removeAttribute('xlink:href');
+  }
+
+  function rewriteBrandUrls(value){
+    if(!value||typeof value!=='string'||value.indexOf('url(')===-1)return value;
+    return value.replace(/url\(\s*(['"]?)(.*?)\1\s*\)/gi,(all,q,url)=>{
+      const target=oldLogoTarget(url,false);
+      return target?'url("'+target+'")':all;
+    });
+  }
+
+  function patchBrandMediaAttrs(el){
+    if(!el||!el.getAttribute)return;
+    ['data-bg','data-bg-hidpi','data-background-image','data-dce-background-image-url','data-dce-background-overlay-image-url','poster','data-poster'].forEach(attr=>{
+      const value=el.getAttribute(attr);
+      if(!value)return;
+      const target=oldLogoTarget(value,false);
+      if(target)el.setAttribute(attr,target);
+    });
+    const style=el.getAttribute('style');
+    if(style&&/url\(/i.test(style)){
+      const fixed=rewriteBrandUrls(style);
+      if(fixed!==style)el.setAttribute('style',fixed);
+    }
+  }
+
+  function patchStyleElement(style){
+    if(!style||style.tagName!=='STYLE')return;
+    const text=style.textContent||'';
+    if(!/url\(/i.test(text))return;
+    const fixed=rewriteBrandUrls(text);
+    if(fixed!==text)style.textContent=fixed;
+  }
+
+  function patchCssRule(rule){
+    if(!rule)return;
+    try{
+      if(rule.style){
+        Array.from(rule.style).forEach(prop=>{
+          const value=rule.style.getPropertyValue(prop);
+          if(!value||value.indexOf('url(')===-1)return;
+          const fixed=rewriteBrandUrls(value);
+          if(fixed!==value)rule.style.setProperty(prop,fixed,rule.style.getPropertyPriority(prop));
+        });
+      }
+      if(rule.cssRules)Array.from(rule.cssRules).forEach(patchCssRule);
+    }catch(e){}
+  }
+
+  function patchBrandCss(){
+    document.querySelectorAll('style').forEach(patchStyleElement);
+    document.querySelectorAll('[style],[data-bg],[data-bg-hidpi],[data-background-image],[data-dce-background-image-url],[data-dce-background-overlay-image-url]').forEach(patchBrandMediaAttrs);
+    Array.from(document.styleSheets||[]).forEach(sheet=>{
+      try{Array.from(sheet.cssRules||[]).forEach(patchCssRule)}catch(e){}
+    });
+  }
+
+  function queueBrandCss(){
+    if(cssScheduled)return;
+    cssScheduled=true;
+    requestAnimationFrame(()=>{cssScheduled=false;patchBrandCss()});
   }
 
   function isLanguageAnchor(el){
@@ -91,7 +192,11 @@
   function patchAttrs(el){
     if(!el||el.nodeType!==1)return;
     ['alt','title','aria-label','placeholder'].forEach(a=>{const v=el.getAttribute(a);if(v){const n=textBrand(v);if(n!==v)el.setAttribute(a,n)}});
+    patchBrandMediaAttrs(el);
     if(el.tagName==='IMG')patchImg(el);
+    else if(el.tagName==='SOURCE')patchSource(el);
+    else if(String(el.tagName).toLowerCase()==='image')patchSvgImage(el);
+    else if(el.tagName==='STYLE')patchStyleElement(el);
     if(el.tagName==='A'){
       if(patchLanguageAnchor(el))return;
       const href=el.getAttribute('href')||'';
@@ -111,7 +216,7 @@
     if(root.nodeType===1)patchAttrs(root);
     const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){const p=n.parentElement;return p&&!SKIP.has(p.tagName)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
     let n;while((n=walker.nextNode()))patchTextNode(n);
-    root.querySelectorAll&&root.querySelectorAll('[alt],[title],[aria-label],[placeholder],img,a[href]').forEach(patchAttrs);
+    root.querySelectorAll&&root.querySelectorAll('[alt],[title],[aria-label],[placeholder],img,source,image,a[href],[style],[data-bg],[data-bg-hidpi],[data-background-image],[data-dce-background-image-url],[data-dce-background-overlay-image-url],style').forEach(patchAttrs);
   }
 
   function meta(selector,kind,key,value){
@@ -172,7 +277,8 @@
     document.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{if(!s.dataset.nasharSchema&&/Adsela|ادسيلا|أدسيلا|adselams\.com|nashar\.digital/i.test(s.textContent||''))s.remove()});
     let schema=document.querySelector('script[data-nashar-schema]');
     if(!schema){schema=document.createElement('script');schema.type='application/ld+json';schema.dataset.nasharSchema='1';document.head.appendChild(schema)}
-    schema.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':SITE+'/#organization',name:IS_EN?EN_BRAND:AR_BRAND,alternateName:IS_EN?AR_BRAND:EN_BRAND,url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+LOGO}},{'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:IS_EN?EN_BRAND:AR_BRAND,alternateName:IS_EN?AR_BRAND:EN_BRAND,publisher:{'@id':SITE+'/#organization'},inLanguage:IS_EN?'en':'ar'},{'@type':'WebPage','@id':SITE+path+'#webpage',url:SITE+path,name:title,isPartOf:{'@id':SITE+'/#website'},about:{'@id':SITE+'/#organization'},inLanguage:IS_EN?'en':'ar'}]});
+    schema.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':SITE+'/#organization',name:IS_EN?EN_BRAND:AR_BRAND,alternateName:IS_EN?AR_BRAND:EN_BRAND,url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+LOGO,contentUrl:SITE+LOGO,caption:BRAND}},{'@type':'WebSite','@id':SITE+'/#website',url:SITE+'/',name:IS_EN?EN_BRAND:AR_BRAND,alternateName:IS_EN?AR_BRAND:EN_BRAND,publisher:{'@id':SITE+'/#organization'},inLanguage:IS_EN?'en':'ar'},{'@type':'WebPage','@id':SITE+path+'#webpage',url:SITE+path,name:title,isPartOf:{'@id':SITE+'/#website'},about:{'@id':SITE+'/#organization'},inLanguage:IS_EN?'en':'ar'}]});
+    patchBrandCss();
   }
 
   function enforceLanguageLinks(){
@@ -182,16 +288,20 @@
   function observe(target){
     if(observer||!target)return;
     observer=new MutationObserver(records=>{
+      let cssNeeded=false;
       for(const r of records){
         if(r.type==='attributes'){
-          if(r.target.tagName==='IMG')patchImg(r.target);
-          else if(r.target.tagName==='A')patchLanguageAnchor(r.target);
+          patchAttrs(r.target);
           continue;
         }
-        r.addedNodes.forEach(patchSubtree);
+        r.addedNodes.forEach(node=>{
+          patchSubtree(node);
+          if(node.nodeType===1&&(node.tagName==='STYLE'||node.tagName==='LINK'||node.querySelector?.('style,link[rel="stylesheet"],[data-bg],[data-background-image]')))cssNeeded=true;
+        });
       }
+      if(cssNeeded)queueBrandCss();
     });
-    observer.observe(target,{childList:true,subtree:true,attributes:true,attributeFilter:['src','data-src','srcset','data-srcset','alt','href']});
+    observer.observe(target,{childList:true,subtree:true,attributes:true,attributeFilter:['src','data-src','data-lazy-src','data-original','data-lazyload','srcset','data-srcset','data-lazy-srcset','alt','href','data-bg','data-bg-hidpi','data-background-image','data-dce-background-image-url','data-dce-background-overlay-image-url']});
   }
 
   function start(){
@@ -201,8 +311,9 @@
       observe(document.documentElement);
       document.addEventListener('DOMContentLoaded',()=>{patchSubtree(document.body);enforceLanguageLinks();patchHead()},{once:true});
     }
-    window.addEventListener('load',()=>{patchHead();enforceLanguageLinks()},{once:true});
-    document.addEventListener('DOMContentLiteSpeedLoaded',()=>{patchHead();enforceLanguageLinks()},{once:true});
+    [100,500,1500,4000,9000].forEach(ms=>setTimeout(()=>{patchBrandCss();patchSubtree(document.body)},ms));
+    window.addEventListener('load',()=>{patchHead();enforceLanguageLinks();patchBrandCss()},{once:true});
+    document.addEventListener('DOMContentLiteSpeedLoaded',()=>{patchHead();enforceLanguageLinks();patchSubtree(document.body);patchBrandCss()});
   }
 
   start();
