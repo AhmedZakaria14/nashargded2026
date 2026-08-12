@@ -139,3 +139,13 @@
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
+
+/* Homepage-only business content updates: portfolio, phone and WhatsApp request form. */
+(function(){
+  if(window.__nasharHomepageBusinessLoader)return;
+  window.__nasharHomepageBusinessLoader=true;
+  const s=document.createElement('script');
+  s.src='/homepage-business-fix.js?v=1';
+  s.async=false;
+  (document.head||document.documentElement).appendChild(s);
+})();
